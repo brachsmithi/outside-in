@@ -66,7 +66,34 @@ We want to have the root application page display a single frame component to pr
 
 We'll start by writing our first test! In inside-out TDD, we might start by writing a test on a Frame JSX component. Here, we'll start by testing the default page.
 
+##### Install Cypress
 To write end-to-end tests for this tutorial, I'm using Cypress. Whatever your preference, you'll need to install it. To install Cypress with npm I used `npm install cypress --save-dev`.
+
+Once Cypress is installed, you'll need to run it in order to configure it. With npm, run `npx cypress open`. This will run Cypress and open the window below.
+
+![Welcome to Cypress](images/s2_welcome_cypress.png)
+
+We're making end-to-end tests, so select the "E2E Testing" section. Cypress will create files in your project directory. The next screen lists what has been created, and you can take a look at the file contents.
+
+You could probably stop here, but it's worth continuing if you haven't used Cypress before. Click "Continue" and you'll see a browser selection.
+
+![Choose Browser](images/s2_choose_browser.png)
+
+Select the browser you'd like and click the button to run E2E tests. You don't have any yet, so a dialog will pop up.
+
+![Create New Spec](images/s2_create_new_spec.png)
+
+We'll make an empty spec, so select the box on the right. Now you'll be prompted to enter a name for the test.
+
+![Enter Spec Path](images/s2_enter_path.png)
+
+Name it "low_score_game". This will create the test file that we'll be working with for the first several steps. Click the create button, and Cypress will show you the generated test.
+
+![Run the Spec](images/s2_run_the_spec.png)
+
+This generates a test that doesn't actually assert anything. It does, however, provide our starting point and the URL for [example.cypress.io](https://example.cypress.io/), which might be useful for continuing to explore cypress outside of this tutorial. Go ahead and run the test so you can see how the results are reported.
+
+Once you have examined the test results, you can close Cypress if you wish. We'll be returning to it frequently, so you might want to leave it running, but you can always run it again when needed with `npx cypress open` (or headless with `npx cypress run`).
 
 ## Learn More
 
