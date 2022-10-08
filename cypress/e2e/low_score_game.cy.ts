@@ -1,5 +1,7 @@
-describe('empty spec', () => {
-  it('passes', () => {
-    cy.visit('https://example.cypress.io')
+describe('Low Score Game', () => {
+  it('should score a game with no spares or strikes', () => {
+    cy.visit('/')
+
+    cy.get('input[data-cy="throw1"]')
   })
 })
