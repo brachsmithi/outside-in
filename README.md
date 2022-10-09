@@ -53,6 +53,8 @@ You should see the default React implementation at the URL given by the startup 
 That's it! You're ready for Step Two!
 
 ### Step Two: Create Page
+This step will go into great detail to show how to use Cypress to test drive. Later steps will be less prescriptive, focusing instead on overall approach.
+
 The first thing we'll need is to have a screen just for our bowling form. No need to style anything yet--just get inputs in place.
 
 Our high-level task list for this step is small.
@@ -146,7 +148,112 @@ Open `src/App.tsx`. There's a lot of stuff in here that we just don't need. The 
         <input type='text' data-cy='throw1'/>
     );
 
-Now your test will pass!
+Now your test will pass! Let's break it again, so we can add more code!
+
+Modify our `get()` command to type in the number 5.
+
+    cy.get('input[data-cy="throw1"]').type('5')
+
+The test still passes but enters the 5 into the input field. We want to move directly to the next input after entering a number, so let's start by asserting that the input we just used is no longer in focus. Cypress allows chaining, so we can add an assertion onto the same line.
+
+    cy.get('input[data-cy="throw1"]').type('5').should('not.have.focus')
+
+Good. Now we can add a blur action to the input.
+
+    <input type='text' data-cy='throw1' onChange={(event) => event.target.blur()}/>
+
+Our test passes, but we still don't have our frame yet. Let's add the second input. We should expect that after the first input loses focus the second input gains it. Using a similar expectation to the previous one, we can construct our new assertion.
+
+    cy.get('input[data-cy="throw2"]').should('have.focus')
+
+Oops. That error looks familiar.
+
+![Throw 2 Not Found](images/s2_throw2_not_found.png)
+
+Before we can give the input focus, it has to exist! We need to add the 2nd input.
+
+    <>
+        <input type='text' data-cy='throw1' onChange={(event) => event.target.blur()}/>
+        <input type='text' data-cy='throw2'/>
+    </>
+
+It doesn't have the onChange callback, because there isn't a failing test to require it yet. Our test still fails, but now because the input doesn't have focus. We'll need to edit the onChange of the first input. We'll use a ref to transfer focus.
+
+    function App() {
+        const throwTwoInput = useRef<HTMLInputElement>(null)
+        return (
+            <>
+                <input type='text' data-cy='throw1' onChange={() => throwTwoInput.current !== null && throwTwoInput.current.focus()}/>
+                <input type='text' data-cy='throw2' ref={throwTwoInput}/>
+            </>
+        );
+    }
+
+That's better, but it points out something we missed earlier. Instead of makng the user click into the 1st input, we should start with it having focus. Let's amend our first assertion chain.
+
+    cy.get('input[data-cy="throw1"]').should('have.focus').type('5').should('not.have.focus')
+
+Our Cypress test fails, so we should set our initial focus. We'll accomplish that with another ref and a layout effect.
+
+    function App() {
+        const throwOneInput = useRef<HTMLInputElement>(null)
+        const throwTwoInput = useRef<HTMLInputElement>(null)
+        useLayoutEffect(() => {
+            throwOneInput.current !== null && throwOneInput.current.focus()
+        })
+        return (
+            <>
+                <input type='text' data-cy='throw1' ref={throwOneInput} onChange={() => throwTwoInput.current !== null && throwTwoInput.current.focus()}/>
+                <input type='text' data-cy='throw2' ref={throwTwoInput}/>
+            </>
+        );
+    }
+
+Good. Now we're getting somewhere, and we're producing quite a lot of duplication. We won't deal with that yet. We have a lot of functionality to add yet, so it's possible that the current similarities could diverge again. Or they'll become stable enough to see the real duplication.
+
+Now we'll finish the assertion chain for the 2nd throw's input.
+
+    cy.get('input[data-cy="throw2"]').should('have.focus').type('3').should('not.have.focus')
+
+The assertions are now fully duplicated, apart for the data-cy and text values. That's okay. If it really bothers you, you can make a custom Cypress command for the chain. That's a bit much for right now, so let's just let it be.
+
+Our code change is going to look familiar.
+
+    <input type='text' data-cy='throw2' ref={throwTwoInput} onChange={(event) => event.target.blur()}/>
+
+Our test passes again, and we have half of our frame completed! Now we need to finish it with a text display of the total. Since this is the simplest case, we can simply add the two values, but we need a new assertion.
+
+    cy.get('[data-cy="total"]').should('have.text', '8')
+
+Here we're using another one of Cypress's semantic assertions. The `have.text` assertion operates much like a text content assertion in jest. Of course, our test is failing before it event gets there. We've seen the failure for no element found before, so I'll skip slightly ahead to show the code that makes the whole assertion pass.
+
+    function App() {
+        const [total, setTotal] = useState<number|null>(null)
+        const throwOneInput = useRef<HTMLInputElement>(null)
+        const throwTwoInput = useRef<HTMLInputElement>(null)
+        const closeSecondThrow = () => {
+            if (throwOneInput.current !== null && throwTwoInput.current !== null) {
+                throwTwoInput.current.blur()
+                const value1 = Number(throwOneInput.current.value)
+                const value2 = Number(throwTwoInput.current.value)
+                setTotal(value1 + value2)
+            }
+        }
+        useLayoutEffect(() => {
+            throwOneInput.current !== null && throwOneInput.current.focus()
+        })
+        return (
+            <>
+                <input type='text' data-cy='throw1' ref={throwOneInput} onChange={() => throwTwoInput.current !== null && throwTwoInput.current.focus()}/>
+                <input type='text' data-cy='throw2' ref={throwTwoInput} onChange={closeSecondThrow}/>
+                <span data-cy='total'>{total}</span>
+            </>
+        );
+    }
+
+Now we have a frame that fully implements the happy path for two throws that total under 10. There's a lot to be desired, though. The code has a lot of duplication, there are no assertions to demonstrate that numbers can't be entered, there's no assurance that the numbers can't be re-entered, and the layout looks nothing like we want.
+
+![Unformatted Frame](images/s2_bad_frame.png)
 
 ## Learn More
 
