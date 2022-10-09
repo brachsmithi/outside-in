@@ -95,6 +95,59 @@ This generates a test that doesn't actually assert anything. It does, however, p
 
 Once you have examined the test results, you can close Cypress if you wish. We'll be returning to it frequently, so you might want to leave it running, but you can always run it again when needed with `npx cypress open` (or headless with `npx cypress run`).
 
+There are a few things you'll need to do manually now to complete setting up Cypress. Go to the `cypress/` folder. You'll see a config file, `cypress.config.ts`. Add an entry inside the `e2e` section `baseUrl: 'http://localhost:3000'` (or whatever port your application runs on). This sets the default host for Cypress to use for URLs it's given, so we'll be able to use relative paths in our tests.
+
+Next, still inside the Cypress directory, create the file `eslint.json` with the following content.
+
+    {
+        "plugins": [
+            "cypress"
+        ]
+    }
+
+One additional file is needed for TypeScript support, `tsconfig.json`.
+
+    {
+        "compilerOptions": {
+            "target": "es5",
+            "lib": ["es5", "dom"],
+            "types": ["cypress", "node"],
+            "jsx": "react"
+        },
+        "include": ["**/*.ts", "**/*.tsx"]
+    }
+
+Now your IDE should hopefully recognize the Cypress library.
+
+##### Test a Frame
+A frame on a bowling score-sheet can take a lot of forms, but generally, there's a top section with at least one box to the right side and an open lower section. We'll make it the way that I remember from youth, with a single box in the upper right.
+
+Our first test will be that numbers can be placed in the two upper sections.
+
+Open the test file we just generated, `cypress/e2e/low_score_game.cy.ts`. The bulk of it looks like standard jest testing, but the sole command is `cy.visit('https://example.cypress.io'`. The global variable `cy` is the handle for interacting with Cypress commands, and `visit()` tells Cypress to load the provided URL. We'll use a relative link, loading our application's landing page.
+
+Change the URL in the visit command to `'/'`. If your application and Cypress aren't running, start them now.
+
+Now the Cypress loads your application instead of the Cypress example page. Let's build on that.
+
+We'll want to make a few changes to the text of the test file. The description should be about the purpose of the test file. Let's make it match the file name "Low Score Game". Similarly, the test name should be more descriptive of its purpose. It 'should score a game with no spares or strikes'.
+
+Now let's build some interactions for our page. Something that will spur us to build our frame component. The most direct way to get an input is to use `cy.get()`, passing it an identifier in x-path format. Cypress recommends using data attributes, so let's expect those. We have a single frame, so let's not worry about making an adaptable identifier just yet. After all, one purpose of this tutorial is to demonstrate how easy it is to evolve applications with outside-in testing.
+
+After the visit line, type `input[data-cy="throw1"]`. Take a look at your test results. You should now see an error.
+
+![Throw 1 Not Found](images/s2_throw1_not_found.png)
+
+Cypress looked for the element and couldn't find it. We should correct that.
+
+Open `src/App.tsx`. There's a lot of stuff in here that we just don't need. The JSX returned by the `App()` function can be replaced by a single input.
+
+    return (
+        <input type='text' data-cy='throw1'/>
+    );
+
+Now your test will pass!
+
 ## Learn More
 
 If you're unfamiliar with the outside-in approach I urge you to peruse [outsidein.dev](https://outsidein.dev/concepts/outside-in-tdd/). Josh Justice does a great job of explaining it with diagrams and examples. His book *Outside-In React Development: A TDD Primer* answered a lot of questions for me about how to reduce redundant tests in front-end code.
