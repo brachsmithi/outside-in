@@ -1,36 +1,29 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { FrameInput } from "./FrameInput";
 
+export type FrameStateEnum = 'First Throw' | 'Second Throw' | 'Done'
 function Frame() {
-  const [total, setTotal] = useState<number|''>('')
+  const [total, setTotal] = useState<number | ''>('')
+  const [frameState, setFrameState] = useState<FrameStateEnum>('First Throw')
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
 
-  const firstThrowOnChange = () => {
-    if (throwOneInput.current?.value === 'x') {
-      throwOneInput.current.value = ''
-      throwOneInput.current.focus()
-    } else {
-      throwTwoInput.current !== null && throwTwoInput.current.focus()
-    }
-  }
-  const secondThrowOnChange = () => {
-    if (throwTwoInput.current?.value === 'y') {
-      throwTwoInput.current.value = ''
-      throwTwoInput.current.focus()
-    } else if (throwOneInput.current !== null && throwTwoInput.current !== null) {
-      throwTwoInput.current.blur()
-      const value1 = Number(throwOneInput.current.value)
-      const value2 = Number(throwTwoInput.current.value)
+  useEffect(() => {
+    if (frameState === 'Done') {
+      const value1 = Number(throwOneInput.current?.value)
+      const value2 = Number(throwTwoInput.current?.value)
       setTotal(value1 + value2)
+      throwTwoInput.current?.blur()
+    } else if (frameState === 'First Throw') {
+      throwOneInput.current?.focus()
+    } else {
+      throwTwoInput.current?.focus()
     }
-  }
-  useLayoutEffect(() => {
-    throwOneInput.current !== null && throwOneInput.current.focus()
-  })
+  }, [frameState])
   return (
     <>
-      <input type='text' data-cy='throw1' ref={throwOneInput} onChange={firstThrowOnChange}/>
-      <input type='text' data-cy='throw2' ref={throwTwoInput} onChange={secondThrowOnChange}/>
+      <FrameInput dataCy='throw1' inputRef={throwOneInput} setFrameState={setFrameState} nextFrameState={'Second Throw'}/>
+      <FrameInput dataCy='throw2' inputRef={throwTwoInput} setFrameState={setFrameState} nextFrameState={'Done'}/>
       <span data-cy='total'>{total}</span>
     </>
   );
