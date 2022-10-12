@@ -11,17 +11,10 @@ describe('Frame Input', () => {
     return <FrameInput inputRef={ref} setFrameState={setState} nextFrameState={'Second Throw'} dataCy={'field'}/>
   }
   describe('character validation', () => {
-    it('should not allow a letter character', () => {
+    it('should reset invalid data', () => {
       render(<TestWrapper/>)
       const inputElement = screen.getByRole('textbox')
-      userEvent.type(inputElement, 'x')
-      expect(inputElement).toHaveDisplayValue('')
-      expect(inputElement).toHaveFocus();
-    })
-    it('should not allow a different letter character', () => {
-      render(<TestWrapper/>)
-      const inputElement = screen.getByRole('textbox')
-      userEvent.type(inputElement, 'y')
+      userEvent.type(inputElement, 'N')
       expect(inputElement).toHaveDisplayValue('')
       expect(inputElement).toHaveFocus();
     })
