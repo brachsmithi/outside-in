@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import { isCharacterValid } from "./validators";
+import { isCharacterValid, isTotalValid } from "./validators";
 
 describe('validator tests', () => {
   describe('isCharacterValid', () => {
@@ -26,6 +26,20 @@ describe('validator tests', () => {
       fc.assert(fc.property(fc.char().filter(t => nonNumericPattern.test(t)), (value: string) => {
         return !isCharacterValid(value)
       }), {numRuns: 30, skipEqualValues: true})
+    })
+  })
+
+  describe('isTotalValid', () => {
+    it('should allow 9 and under', () => {
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (total: number) => {
+        return isTotalValid(total)
+      }), {numRuns: 10, skipEqualValues: true})
+    })
+
+    it('should not allow totals over 10', () => {
+      fc.assert(fc.property(fc.integer({min: 10}), (total: number) => {
+        return !isTotalValid(total)
+      }), {numRuns: 10, skipEqualValues: true})
     })
   })
 })

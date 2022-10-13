@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FrameInput } from "./FrameInput";
+import { isTotalValid } from "./validators";
 
 export type FrameStateEnum = 'First Throw' | 'Second Throw' | 'Done'
 function Frame() {
@@ -10,10 +11,17 @@ function Frame() {
 
   useEffect(() => {
     if (frameState === 'Done') {
-      const value1 = Number(throwOneInput.current?.value)
-      const value2 = Number(throwTwoInput.current?.value)
-      setTotal(value1 + value2)
-      throwTwoInput.current?.blur()
+      if (throwOneInput.current && throwTwoInput.current) {
+        const value1 = Number(throwOneInput.current.value)
+        const value2 = Number(throwTwoInput.current.value)
+        const total = value1 + value2
+        if (isTotalValid(total)) {
+          setTotal(total)
+          throwTwoInput.current.blur()
+        } else {
+          throwTwoInput.current.value = ''
+        }
+      }
     } else if (frameState === 'First Throw') {
       throwOneInput.current?.focus()
     } else {
