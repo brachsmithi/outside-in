@@ -31,8 +31,8 @@ function Frame() {
   }, [frameState])
   return (
     <>
-      <FrameInput dataCy='throw1' inputRef={throwOneInput} setFrameState={setFrameState} nextFrameState={'Second Throw'}/>
-      <FrameInput dataCy='throw2' inputRef={throwTwoInput} setFrameState={setFrameState} nextFrameState={'Done'}/>
+      <FrameInput dataCy='throw1' active={frameState === 'First Throw'} inputRef={throwOneInput} setFrameState={setFrameState} nextFrameState={'Second Throw'}/>
+      <FrameInput dataCy='throw2' active={frameState === 'Second Throw'} inputRef={throwTwoInput} setFrameState={setFrameState} nextFrameState={'Done'}/>
       <span data-cy='total'>{total}</span>
     </>
   );

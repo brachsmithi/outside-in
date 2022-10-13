@@ -8,7 +8,7 @@ describe('Frame Input', () => {
   function TestWrapper() {
     const [_, setState] = useState<FrameStateEnum>('First Throw')
     const ref = useRef<HTMLInputElement>(null)
-    return <FrameInput inputRef={ref} setFrameState={setState} nextFrameState={'Second Throw'} dataCy={'field'}/>
+    return <FrameInput inputRef={ref} active={true} setFrameState={setState} nextFrameState={'Second Throw'} dataCy={'field'}/>
   }
   describe('character validation', () => {
     it('should reset invalid data', () => {
