@@ -20,6 +20,7 @@ function Frame() {
           throwTwoInput.current.blur()
         } else {
           throwTwoInput.current.value = ''
+          setFrameState('Second Throw')
         }
       }
     } else if (frameState === 'First Throw') {

@@ -10,6 +10,7 @@ describe('Frame test', () => {
       userEvent.type(inputs[0], '7')
       userEvent.type(inputs[1], '9')
       expect(inputs[1]).toHaveDisplayValue('')
+      expect(inputs[1]).toHaveFocus()
     })
   })
 })
