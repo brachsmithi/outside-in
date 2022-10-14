@@ -1,10 +1,10 @@
 import React from 'react';
 import './App.css';
-import Frame from "./Frame";
+import { ScoreCardRow } from "./ScoreCardRow";
 
 function App() {
   return (
-    <Frame/>
+    <ScoreCardRow/>
   );
 }
 
