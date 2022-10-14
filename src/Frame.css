@@ -1,0 +1,21 @@
+.frame {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid black;
+    padding: 0;
+    margin: .5rem;
+}
+
+.frame-top {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.frame-bottom {
+    text-align: center;
+    width: 100%;
+}

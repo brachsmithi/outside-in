@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import './Frame.css'
 import { FrameInput } from "./FrameInput";
 import { isTotalValid } from "./validators";
 
@@ -30,11 +31,15 @@ function Frame() {
     }
   }, [frameState])
   return (
-    <>
-      <FrameInput dataCy='throw1' active={frameState === 'First Throw'} inputRef={throwOneInput} setFrameState={setFrameState} nextFrameState={'Second Throw'}/>
-      <FrameInput dataCy='throw2' active={frameState === 'Second Throw'} inputRef={throwTwoInput} setFrameState={setFrameState} nextFrameState={'Done'}/>
-      <span data-cy='total'>{total}</span>
-    </>
+    <div className='frame'>
+      <div className='frame-top'>
+        <FrameInput dataCy='throw1' active={frameState === 'First Throw'} inputRef={throwOneInput} setFrameState={setFrameState} nextFrameState={'Second Throw'}/>
+        <FrameInput dataCy='throw2' active={frameState === 'Second Throw'} inputRef={throwTwoInput} setFrameState={setFrameState} nextFrameState={'Done'}/>
+      </div>
+      <div className='frame-bottom'>
+        <span data-cy='total'>{total}</span>
+      </div>
+    </div>
   );
 }
 

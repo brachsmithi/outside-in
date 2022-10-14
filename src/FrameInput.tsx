@@ -1,6 +1,7 @@
 import { RefObject } from "react";
 import { FrameStateEnum } from "./Frame";
 import { isCharacterValid } from "./validators";
+import './FrameInput.css'
 
 export type FrameInputProps = {
   inputRef: RefObject<HTMLInputElement>
@@ -20,5 +21,5 @@ export function FrameInput({inputRef, active, setFrameState, nextFrameState, dat
       }
     }
   }
-  return <input type='text' ref={inputRef} disabled={!active} onChange={changeHandler} data-cy={dataCy}/>
+  return <input type='text' className='frame-input' ref={inputRef} disabled={!active} onChange={changeHandler} data-cy={dataCy}/>
 }
