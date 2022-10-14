@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './Frame.css'
 import { FrameInput } from "./FrameInput";
-import { isTotalValid } from "./validators";
-import { FrameStateEnum } from "./stateEnums";
+import { isTotalValid } from "../functions/validators";
+import { FrameStateEnum } from "../models/stateEnums";
 
 export type FrameProps = {
   dataCy: string

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { FrameInput } from "./FrameInput";
 import userEvent from "@testing-library/user-event";
 import { useRef, useState } from "react";
-import { FrameStateEnum } from "./stateEnums";
+import { FrameStateEnum } from "../models/stateEnums";
 
 describe('Frame Input', () => {
   function TestWrapper() {

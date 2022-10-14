@@ -1,7 +1,7 @@
 import { RefObject } from "react";
-import { isCharacterValid } from "./validators";
+import { isCharacterValid } from "../functions/validators";
 import './FrameInput.css'
-import { FrameStateEnum } from "./stateEnums";
+import { FrameStateEnum } from "../models/stateEnums";
 
 export type FrameInputProps = {
   inputRef: RefObject<HTMLInputElement>
