@@ -14,18 +14,17 @@ export function ScoreCardRow() {
   }
   return (
       <>
-        <Frame
-            dataCy={frameDescriptions[0].tag}
-            isActive={activeFrame.index === frameDescriptions[0].index}
-            onFinish={advanceFrame}
-            previousFrameScore={0}
-        />
-        <Frame
-            dataCy={frameDescriptions[1].tag}
-            isActive={activeFrame.index === frameDescriptions[1].index}
-            onFinish={advanceFrame}
-            previousFrameScore={frameDescriptions[0].score}
-        />
+        {
+          frameDescriptions.map(description => {
+            return <Frame
+                key={description.tag}
+                dataCy={description.tag}
+                isActive={activeFrame.index === description.index}
+                onFinish={advanceFrame}
+                previousFrameScore={frameDescriptions[description.index - 1]?.score ?? 0}
+            />
+          })
+        }
       </>
   )
 }
