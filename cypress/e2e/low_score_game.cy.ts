@@ -1,45 +1,38 @@
 describe('Low Score Game', () => {
   it('should score a game with no spares or strikes', () => {
+    function forFrame(frameNumber: number) {
+      const label = `frame${frameNumber}`
+      function rollBall(throwNumber: number, pinsKnockedDown) {
+        cy.get(`input[data-cy="${ label }_throw${throwNumber}"]`).should('have.focus').type(String(pinsKnockedDown)).should('not.have.focus').should('be.disabled')
+      }
+      return {
+        throwOneIs(pinsKnockedDown1: number) {
+          rollBall(1, pinsKnockedDown1)
+          return {
+            throwTwoIs(pinsKnockedDown2: number) {
+              rollBall(2, pinsKnockedDown2)
+              return {
+                whichTotals(expectedTotal: number) {
+                  cy.get(`[data-cy="${ label }_total"]`).should('have.text', String(expectedTotal))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     cy.visit('/')
 
-    cy.get('input[data-cy="frame1_throw1"]').should('have.focus').type('5').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame1_throw2"]').should('have.focus').type('3').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame1_total"]').should('have.text', '8')
-
-    cy.get('input[data-cy="frame2_throw1"]').should('have.focus').type('7').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame2_throw2"]').should('have.focus').type('0').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame2_total"]').should('have.text', '15')
-
-    cy.get('input[data-cy="frame3_throw1"]').should('have.focus').type('4').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame3_throw2"]').should('have.focus').type('2').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame3_total"]').should('have.text', '21')
-
-    cy.get('input[data-cy="frame4_throw1"]').should('have.focus').type('0').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame4_throw2"]').should('have.focus').type('3').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame4_total"]').should('have.text', '24')
-
-    cy.get('input[data-cy="frame5_throw1"]').should('have.focus').type('3').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame5_throw2"]').should('have.focus').type('4').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame5_total"]').should('have.text', '31')
-
-    cy.get('input[data-cy="frame6_throw1"]').should('have.focus').type('6').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame6_throw2"]').should('have.focus').type('1').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame6_total"]').should('have.text', '38')
-
-    cy.get('input[data-cy="frame7_throw1"]').should('have.focus').type('3').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame7_throw2"]').should('have.focus').type('2').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame7_total"]').should('have.text', '43')
-
-    cy.get('input[data-cy="frame8_throw1"]').should('have.focus').type('6').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame8_throw2"]').should('have.focus').type('0').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame8_total"]').should('have.text', '49')
-
-    cy.get('input[data-cy="frame9_throw1"]').should('have.focus').type('7').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame9_throw2"]').should('have.focus').type('1').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame9_total"]').should('have.text', '57')
-
-    cy.get('input[data-cy="frame10_throw1"]').should('have.focus').type('0').should('not.have.focus').should('be.disabled')
-    cy.get('input[data-cy="frame10_throw2"]').should('have.focus').type('4').should('not.have.focus').should('be.disabled')
-    cy.get('[data-cy="frame10_total"]').should('have.text', '61')
+    forFrame(1).throwOneIs(5).throwTwoIs(3).whichTotals(8)
+    forFrame(2).throwOneIs(7).throwTwoIs(0).whichTotals(15)
+    forFrame(3).throwOneIs(4).throwTwoIs(2).whichTotals(21)
+    forFrame(4).throwOneIs(0).throwTwoIs(3).whichTotals(24)
+    forFrame(5).throwOneIs(3).throwTwoIs(4).whichTotals(31)
+    forFrame(6).throwOneIs(6).throwTwoIs(1).whichTotals(38)
+    forFrame(7).throwOneIs(3).throwTwoIs(2).whichTotals(43)
+    forFrame(8).throwOneIs(6).throwTwoIs(0).whichTotals(49)
+    forFrame(9).throwOneIs(7).throwTwoIs(1).whichTotals(57)
+    forFrame(10).throwOneIs(0).throwTwoIs(4).whichTotals(61)
   })
 })
