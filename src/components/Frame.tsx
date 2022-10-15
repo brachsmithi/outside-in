@@ -11,7 +11,7 @@ export type FrameProps = {
   previousFrameScore: number | null
 }
 
-function Frame({dataCy, isActive, onFinish, previousFrameScore}: FrameProps) {
+export function Frame({dataCy, isActive, onFinish, previousFrameScore}: FrameProps) {
   const [total, setTotal] = useState<number | ''>('')
   const [frameState, setFrameState] = useState<FrameStateEnum>('Not Started')
   const throwOneInput = useRef<HTMLInputElement>(null)
@@ -68,5 +68,3 @@ function Frame({dataCy, isActive, onFinish, previousFrameScore}: FrameProps) {
     </div>
   );
 }
-
-export default Frame;

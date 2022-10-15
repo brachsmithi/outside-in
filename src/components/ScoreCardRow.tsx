@@ -1,28 +1,30 @@
-import Frame from "./Frame";
+import { Frame } from "./Frame";
 import { useState } from "react";
+import { createFrameDescriptions } from "../functions/initializers";
+import { FrameDescription } from "../models/FrameDescription";
 
 export function ScoreCardRow() {
-  const [activeFrame, setActiveFrame] = useState(0)
-  const [frameScore, setFrameScore] = useState<Array<number | null>>([])
+  const [frameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
+  const [activeFrame, setActiveFrame] = useState<FrameDescription>(frameDescriptions[0])
   const advanceFrame = (frameTotal: number) => {
-    const scores = [...frameScore]
-    scores[activeFrame] = frameTotal
-    setFrameScore(scores)
-    setActiveFrame(activeFrame + 1)
+    activeFrame.score = frameTotal
+    if (activeFrame.index + 1 < frameDescriptions.length) {
+      setActiveFrame(frameDescriptions[activeFrame.index + 1])
+    }
   }
   return (
       <>
         <Frame
-            dataCy='frame1'
-            isActive={activeFrame === 0}
+            dataCy={frameDescriptions[0].tag}
+            isActive={activeFrame.index === frameDescriptions[0].index}
             onFinish={advanceFrame}
             previousFrameScore={0}
         />
         <Frame
-            dataCy='frame2'
-            isActive={activeFrame === 1}
+            dataCy={frameDescriptions[1].tag}
+            isActive={activeFrame.index === frameDescriptions[1].index}
             onFinish={advanceFrame}
-            previousFrameScore={frameScore[0]}
+            previousFrameScore={frameDescriptions[0].score}
         />
       </>
   )

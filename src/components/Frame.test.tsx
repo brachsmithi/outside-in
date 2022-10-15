@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import Frame from "./Frame";
+import { Frame } from "./Frame";
 import userEvent from "@testing-library/user-event";
 
 describe('Frame test', () => {
