@@ -2,6 +2,7 @@ import { Frame } from "./Frame";
 import { useState } from "react";
 import { createFrameDescriptions } from "../functions/initializers";
 import { FrameDescription } from "../models/FrameDescription";
+import './ScoreCardRow.css'
 
 export function ScoreCardRow() {
   const [frameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
@@ -13,7 +14,7 @@ export function ScoreCardRow() {
     }
   }
   return (
-      <>
+      <div className='scoreCardRow'>
         {
           frameDescriptions.map(description => {
             return <Frame
@@ -25,6 +26,6 @@ export function ScoreCardRow() {
             />
           })
         }
-      </>
+      </div>
   )
 }
