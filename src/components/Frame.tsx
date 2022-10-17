@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './Frame.css'
 import { FrameInput } from "./FrameInput";
-import { isTotalValid } from "../functions/validators";
+import { isSecondThrowValid } from "../functions/validators";
 import { FrameStateEnum } from "../models/stateEnums";
 
 export type FrameProps = {
@@ -23,7 +23,7 @@ export function Frame({dataCy, isActive, onFinish, previousFrameScore}: FramePro
         const value1 = Number(throwOneInput.current.value)
         const value2 = Number(throwTwoInput.current.value)
         const frameTotal = value1 + value2
-        if (isTotalValid(frameTotal)) {
+        if (isSecondThrowValid(value1, value2)) {
           const newTotal = (previousFrameScore ?? 0) + frameTotal
           setTotal(newTotal)
           throwTwoInput.current.blur()

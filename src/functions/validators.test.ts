@@ -1,5 +1,5 @@
 import * as fc from 'fast-check';
-import { isCharacterValid, isTotalValid } from "./validators";
+import { isCharacterValid, isSecondThrowValid } from "./validators";
 
 describe('validator tests', () => {
   describe('isCharacterValid', () => {
@@ -32,16 +32,19 @@ describe('validator tests', () => {
     })
   })
 
-  describe('isTotalValid', () => {
-    it('should allow 9 and under', () => {
-      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (total: number) => {
-        return isTotalValid(total)
+  describe('isSecondThrowValid', () => {
+    it('should allow totals over 10 or a spare', () => {
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
+        return isSecondThrowValid(firstThrow, 9 - firstThrow)
       }), {numRuns: 10, skipEqualValues: true})
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
+        return isSecondThrowValid(firstThrow, '/')
+      }))
     })
 
     it('should not allow totals over 10', () => {
-      fc.assert(fc.property(fc.integer({min: 10}), (total: number) => {
-        return !isTotalValid(total)
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
+        return !isSecondThrowValid(firstThrow, 10 - firstThrow)
       }), {numRuns: 10, skipEqualValues: true})
     })
   })
