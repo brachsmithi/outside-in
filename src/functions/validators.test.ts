@@ -3,10 +3,13 @@ import { isCharacterValid, isTotalValid } from "./validators";
 
 describe('validator tests', () => {
   describe('isCharacterValid', () => {
-    it('should allow single digits', () => {
+    it('should allow single digits and spares', () => {
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (num: number) => {
         return isCharacterValid(num.toString())
       }), {numRuns: 10, skipEqualValues: true})
+      fc.assert(fc.property(fc.constant('/'), (slash: string) => {
+        return isCharacterValid(slash)
+      }))
     })
 
     it('should not allow numbers over one digit', () => {
@@ -23,7 +26,7 @@ describe('validator tests', () => {
 
     it('should not allow non-numeric characters', () => {
       const nonNumericPattern = new RegExp('\\D')
-      fc.assert(fc.property(fc.char().filter(t => nonNumericPattern.test(t)), (value: string) => {
+      fc.assert(fc.property(fc.char().filter(t => nonNumericPattern.test(t) && t !== '/'), (value: string) => {
         return !isCharacterValid(value)
       }), {numRuns: 30, skipEqualValues: true})
     })

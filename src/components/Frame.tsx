@@ -7,7 +7,7 @@ import { FrameStateEnum } from "../models/stateEnums";
 export type FrameProps = {
   dataCy: string
   isActive: boolean
-  onFinish: (total: number) => void
+  onFinish: (total: number | null) => void
   previousFrameScore: number | null
 }
 
@@ -33,6 +33,9 @@ export function Frame({dataCy, isActive, onFinish, previousFrameScore}: FramePro
           setFrameState('Second Throw')
         }
       }
+    } else if (frameState === 'Pending') {
+      throwTwoInput.current?.blur()
+      onFinish(null)
     } else if (frameState === 'First Throw') {
       throwOneInput.current?.focus()
     } else {

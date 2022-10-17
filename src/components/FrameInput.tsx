@@ -15,7 +15,11 @@ export function FrameInput({inputRef, active, setFrameState, nextFrameState, dat
   const changeHandler = () => {
     if (inputRef.current?.value) {
       if (isCharacterValid(inputRef.current?.value)) {
-        setFrameState(nextFrameState)
+        if (inputRef.current?.value === '/') {
+          setFrameState('Pending')
+        } else {
+          setFrameState(nextFrameState)
+        }
       } else {
         inputRef.current.value = ''
       }
