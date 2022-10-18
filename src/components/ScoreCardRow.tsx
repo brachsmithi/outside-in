@@ -24,7 +24,6 @@ export function ScoreCardRow() {
             return <Frame
                 key={description.tag}
                 description={description}
-                dataCy={description.tag}
                 isActive={activeFrame.index === description.index}
                 onFinish={advanceFrame}
             />

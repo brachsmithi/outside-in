@@ -7,12 +7,11 @@ import { FrameDescription } from "../models/FrameDescription";
 
 export type FrameProps = {
   description: FrameDescription
-  dataCy: string
   isActive: boolean
   onFinish: (firstThrow: string, secondThrow: string) => void
 }
 
-export function Frame({description, dataCy, isActive, onFinish}: FrameProps) {
+export function Frame({description, isActive, onFinish}: FrameProps) {
   const [frameState, setFrameState] = useState<FrameStateEnum>('Not Started')
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
@@ -48,14 +47,14 @@ export function Frame({description, dataCy, isActive, onFinish}: FrameProps) {
     <div className='frame'>
       <div className='frame-top'>
         <FrameInput
-            dataCy={ `${dataCy}_throw1` }
+            dataCy={ `${description.tag}_throw1` }
             active={frameState === 'First Throw'}
             inputRef={throwOneInput}
             setFrameState={setFrameState}
             nextFrameState={'Second Throw'}
         />
         <FrameInput
-            dataCy={ `${dataCy}_throw2` }
+            dataCy={ `${description.tag}_throw2` }
             active={frameState === 'Second Throw'}
             inputRef={throwTwoInput}
             setFrameState={setFrameState}
@@ -63,7 +62,7 @@ export function Frame({description, dataCy, isActive, onFinish}: FrameProps) {
         />
       </div>
       <div className='frame-bottom'>
-        <span data-cy={ `${dataCy}_total` }>{description.score}</span>
+        <span data-cy={ `${description.tag}_total` }>{description.score}</span>
       </div>
     </div>
   );
