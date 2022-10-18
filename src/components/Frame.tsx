@@ -10,10 +10,9 @@ export type FrameProps = {
   dataCy: string
   isActive: boolean
   onFinish: (firstThrow: string, secondThrow: string) => void
-  previousFrameScore: number | null
 }
 
-export function Frame({description, dataCy, isActive, onFinish, previousFrameScore}: FrameProps) {
+export function Frame({description, dataCy, isActive, onFinish}: FrameProps) {
   const [frameState, setFrameState] = useState<FrameStateEnum>('Not Started')
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
@@ -41,7 +40,7 @@ export function Frame({description, dataCy, isActive, onFinish, previousFrameSco
     } else {
       throwTwoInput.current?.focus()
     }
-  }, [frameState, previousFrameScore])
+  }, [frameState])
   useEffect(() => {
     if (isActive && frameState === 'Not Started') {
       setFrameState('First Throw')

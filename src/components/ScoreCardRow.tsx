@@ -27,7 +27,6 @@ export function ScoreCardRow() {
                 dataCy={description.tag}
                 isActive={activeFrame.index === description.index}
                 onFinish={advanceFrame}
-                previousFrameScore={frameDescriptions[description.index - 1]?.score ?? 0}
             />
           })
         }

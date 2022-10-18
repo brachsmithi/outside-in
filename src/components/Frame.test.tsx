@@ -11,7 +11,7 @@ describe('Frame test', () => {
         index: 0,
         tag: 'frame',
       }
-      render(<Frame description={description} dataCy={description.tag} isActive={true} onFinish={jest.fn()} previousFrameScore={0}/>)
+      render(<Frame description={description} dataCy={description.tag} isActive={true} onFinish={jest.fn()}/>)
       const inputs = screen.getAllByRole('textbox')
       userEvent.type(inputs[0], '7')
       userEvent.type(inputs[1], '9')
