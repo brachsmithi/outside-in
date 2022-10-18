@@ -35,16 +35,16 @@ describe('validator tests', () => {
   describe('isSecondThrowValid', () => {
     it('should allow totals over 10 or a spare', () => {
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
-        return isSecondThrowValid(firstThrow, 9 - firstThrow)
+        return isSecondThrowValid(String(firstThrow), String(9 - firstThrow))
       }), {numRuns: 10, skipEqualValues: true})
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
-        return isSecondThrowValid(firstThrow, '/')
+        return isSecondThrowValid(String(firstThrow), '/')
       }))
     })
 
     it('should not allow totals over 10', () => {
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
-        return !isSecondThrowValid(firstThrow, 10 - firstThrow)
+        return !isSecondThrowValid(String(firstThrow), String(10 - firstThrow))
       }), {numRuns: 10, skipEqualValues: true})
     })
   })

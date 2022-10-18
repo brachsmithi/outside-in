@@ -20,9 +20,7 @@ export function Frame({description, dataCy, isActive, onFinish}: FrameProps) {
   useEffect(() => {
     if (frameState === 'Done') {
       if (throwOneInput.current && throwTwoInput.current) {
-        const value1 = Number(throwOneInput.current.value)
-        const value2 = Number(throwTwoInput.current.value)
-        if (isSecondThrowValid(value1, value2)) {
+        if (isSecondThrowValid(throwOneInput.current.value, throwTwoInput.current.value)) {
           throwTwoInput.current.blur()
           onFinish(throwOneInput.current.value, throwTwoInput.current.value)
         } else {
