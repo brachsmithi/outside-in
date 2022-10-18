@@ -7,7 +7,7 @@ import './ScoreCardRow.css'
 export function ScoreCardRow() {
   const [frameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
   const [activeFrame, setActiveFrame] = useState<FrameDescription>(frameDescriptions[0])
-  const advanceFrame = (frameTotal: number | null) => {
+  const advanceFrame = (frameTotal: number | null, firstThrow: string, secondThrow: string) => {
     if (frameTotal) {
       activeFrame.score = frameTotal
     }
