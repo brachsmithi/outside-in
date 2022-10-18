@@ -33,19 +33,56 @@ describe('validator tests', () => {
   })
 
   describe('isSecondThrowValid', () => {
+
+    type ThrowConstraints = {
+      min: number,
+      max: number,
+    }
+
+    type ConstraintCalculator = {
+      min: (seed: number) => number,
+      max: (seed: number) => number,
+    }
+
+    function calculateConstraints(calculator: ConstraintCalculator, seed: number): ThrowConstraints {
+      return {
+        min: calculator.min(seed),
+        max: calculator.max(seed),
+      }
+    }
+
+    function throwGenerator(firstThrowConstraints: ThrowConstraints, secondThrowCalculator: ConstraintCalculator) {
+      return fc.integer(firstThrowConstraints).chain((first) => {
+        return fc.tuple(
+            fc.constant(String(first)),
+            fc.integer(calculateConstraints(secondThrowCalculator, first)).chain(num => {
+                return fc.constant(String(num))
+            })
+        );
+      })
+    }
+
+    function generateValidThrows() {
+      return throwGenerator({min: 0, max: 9}, {min: (_: number) => 0, max: (first: number) => 9 - first})
+    }
+
+    function generateInvalidThrows() {
+      return throwGenerator({min: 1, max: 9}, {min: (first: number) => 10 - first, max: (_: number) => 9})
+    }
+
     it('should allow totals over 10 or a spare', () => {
-      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
-        return isSecondThrowValid(String(firstThrow), String(9 - firstThrow))
-      }), {numRuns: 10, skipEqualValues: true})
+        fc.assert(fc.property(generateValidThrows(), (pinCounts: string[]) => {
+        return isSecondThrowValid(pinCounts[0], pinCounts[1])
+      }), {numRuns: 20, skipEqualValues: true})
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
         return isSecondThrowValid(String(firstThrow), '/')
       }))
     })
 
     it('should not allow totals over 10', () => {
-      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
-        return !isSecondThrowValid(String(firstThrow), String(10 - firstThrow))
-      }), {numRuns: 10, skipEqualValues: true})
+      fc.assert(fc.property(generateInvalidThrows(), (pinCounts: string[]) => {
+        return !isSecondThrowValid(pinCounts[0], pinCounts[1])
+      }), {numRuns: 20, skipEqualValues: true})
     })
   })
 })
