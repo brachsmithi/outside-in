@@ -3,16 +3,17 @@ import './Frame.css'
 import { FrameInput } from "./FrameInput";
 import { isSecondThrowValid } from "../functions/validators";
 import { FrameStateEnum } from "../models/stateEnums";
+import { FrameDescription } from "../models/FrameDescription";
 
 export type FrameProps = {
+  description: FrameDescription
   dataCy: string
   isActive: boolean
   onFinish: (firstThrow: string, secondThrow: string) => void
   previousFrameScore: number | null
 }
 
-export function Frame({dataCy, isActive, onFinish, previousFrameScore}: FrameProps) {
-  const [total, setTotal] = useState<number | ''>('')
+export function Frame({description, dataCy, isActive, onFinish, previousFrameScore}: FrameProps) {
   const [frameState, setFrameState] = useState<FrameStateEnum>('Not Started')
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
@@ -22,10 +23,7 @@ export function Frame({dataCy, isActive, onFinish, previousFrameScore}: FramePro
       if (throwOneInput.current && throwTwoInput.current) {
         const value1 = Number(throwOneInput.current.value)
         const value2 = Number(throwTwoInput.current.value)
-        const frameTotal = value1 + value2
         if (isSecondThrowValid(value1, value2)) {
-          const newTotal = (previousFrameScore ?? 0) + frameTotal
-          setTotal(newTotal)
           throwTwoInput.current.blur()
           onFinish(throwOneInput.current.value, throwTwoInput.current.value)
         } else {
@@ -68,7 +66,7 @@ export function Frame({dataCy, isActive, onFinish, previousFrameScore}: FramePro
         />
       </div>
       <div className='frame-bottom'>
-        <span data-cy={ `${dataCy}_total` }>{total}</span>
+        <span data-cy={ `${dataCy}_total` }>{description.score}</span>
       </div>
     </div>
   );
