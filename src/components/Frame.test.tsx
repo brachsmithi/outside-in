@@ -7,9 +7,12 @@ describe('Frame test', () => {
   describe('form validation', () => {
     it('should not allow more than 10 pins to be recorded', () => {
       const description: FrameDescription = {
-        score: null,
         index: 0,
         tag: 'frame',
+        score: null,
+        firstThrow: null,
+        secondThrow: null,
+        frameState: 'First Throw',
       }
       render(<Frame description={description} isActive={true} onFinish={jest.fn()}/>)
       const inputs = screen.getAllByRole('textbox')

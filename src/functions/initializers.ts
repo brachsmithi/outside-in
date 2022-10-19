@@ -7,6 +7,9 @@ export function createFrameDescriptions(): FrameDescription[] {
       index: i,
       tag: `frame${i + 1}`,
       score: null,
+      firstThrow: null,
+      secondThrow: null,
+      frameState: 'Not Started'
     })
   }
   return descriptions
