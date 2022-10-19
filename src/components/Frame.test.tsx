@@ -14,7 +14,7 @@ describe('Frame test', () => {
         secondThrow: null,
         frameState: 'First Throw',
       }
-      render(<Frame description={description} isActive={true} onFinish={jest.fn()}/>)
+      render(<Frame description={description} isActive={true} onFinish={jest.fn()} setStateForFrame={jest.fn()}/>)
       const inputs = screen.getAllByRole('textbox')
       userEvent.type(inputs[0], '7')
       userEvent.type(inputs[1], '9')
