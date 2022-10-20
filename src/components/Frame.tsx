@@ -45,7 +45,7 @@ export function Frame({description, isActive, onFinish, setStateForFrame}: Frame
   }, [internalFrameState])
   useEffect(() => {
     if (isActive && internalFrameState === 'Not Started') {
-      setInternalFrameState('First Throw')
+      setFrameState('First Throw')
     }
   }, [internalFrameState, isActive])
 
@@ -56,14 +56,14 @@ export function Frame({description, isActive, onFinish, setStateForFrame}: Frame
             dataCy={ `${description.tag}_throw1` }
             active={internalFrameState === 'First Throw'}
             inputRef={throwOneInput}
-            setFrameState={setInternalFrameState}
+            setFrameState={setFrameState}
             nextFrameState={'Second Throw'}
         />
         <FrameInput
             dataCy={ `${description.tag}_throw2` }
             active={internalFrameState === 'Second Throw'}
             inputRef={throwTwoInput}
-            setFrameState={setInternalFrameState}
+            setFrameState={setFrameState}
             nextFrameState={'Done'}
         />
       </div>

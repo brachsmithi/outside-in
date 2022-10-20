@@ -6,11 +6,13 @@ import './ScoreCardRow.css'
 import { FrameStateEnum } from "../models/stateEnums";
 
 export function ScoreCardRow() {
-  const [frameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
+  const [frameDescriptions, setFrameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
   const [activeFrame, setActiveFrame] = useState<FrameDescription>(frameDescriptions[0])
 
   function setFrameState(frameState: FrameStateEnum, index: number) {
-    frameDescriptions[index].frameState = frameState
+    const descriptions = [...frameDescriptions]
+    descriptions[index].frameState = frameState
+    setFrameDescriptions(descriptions)
   }
   const advanceFrame = (firstThrow: string, secondThrow: string) => {
     const previousFrame = (activeFrame.index - 1 >= 0) ? frameDescriptions[activeFrame.index - 1] : null
