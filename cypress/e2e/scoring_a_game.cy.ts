@@ -91,4 +91,48 @@ describe('Scoring a Game', () => {
     expectFrame(11).totalToBe(160)
   })
 
+  it('should not allow invalid data in the game', () => {
+    function forFrame(frameNumber: number) {
+      const label = `frame${frameNumber}`
+      function rollBall(throwNumber: number, pinsKnockedDown: string) {
+        cy.get(`input[data-cy="${ label }_throw${throwNumber}"]`).should('have.focus').type(pinsKnockedDown)
+      }
+      function andIsReadyForInput(throwNumber: number) {
+        cy.get(`input[data-cy="${ label }_throw${ throwNumber }"]`).should('have.focus').should('have.value', '')
+      }
+      function throwTwoIs(pinsKnockedDown: string) {
+        const throwNo = 2
+        rollBall(throwNo, pinsKnockedDown)
+        return {
+          andIsReadyForInput() {
+            andIsReadyForInput(throwNo)
+          },
+          whichTotals(total: number) {
+            cy.get(`[data-cy="${ label }_total"]`).should('have.text', String(total))
+          }
+        }
+      }
+      return {
+        throwOneIs(pinsKnockedDown: string) {
+          const throwNo = 1
+          rollBall(throwNo, pinsKnockedDown)
+          return {
+            andIsReadyForInput() {
+              andIsReadyForInput(throwNo)
+            },
+            throwTwoIs
+          }
+        },
+        throwTwoIs
+      }
+    }
+
+    cy.visit('/')
+
+    forFrame(1).throwOneIs('s').andIsReadyForInput()
+    forFrame(1).throwOneIs('8').throwTwoIs('9').andIsReadyForInput()
+    forFrame(1).throwTwoIs('w').andIsReadyForInput()
+    forFrame(1).throwTwoIs('1').whichTotals(9)
+  })
+
 })

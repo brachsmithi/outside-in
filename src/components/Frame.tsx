@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './Frame.css'
 import { FrameInput } from "./FrameInput";
 import { isSecondThrowValid } from "../functions/validators";
@@ -13,16 +13,14 @@ export type FrameProps = {
 }
 
 export function Frame({description, isActive, onFinish, setStateForFrame}: FrameProps) {
-  const [internalFrameState, setInternalFrameState] = useState<FrameStateEnum>('Not Started')
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
 
   function setFrameState(frameState: FrameStateEnum) {
-    setInternalFrameState(frameState)
     setStateForFrame(frameState, description.index)
   }
   useEffect(() => {
-    if (internalFrameState === 'Done') {
+    if (description.frameState === 'Done') {
       if (throwOneInput.current && throwTwoInput.current) {
         if (isSecondThrowValid(throwOneInput.current.value, throwTwoInput.current.value)) {
           throwTwoInput.current.blur()
@@ -32,36 +30,36 @@ export function Frame({description, isActive, onFinish, setStateForFrame}: Frame
           setFrameState('Second Throw')
         }
       }
-    } else if (internalFrameState === 'Pending') {
+    } else if (description.frameState === 'Pending') {
       if (throwOneInput.current && throwTwoInput.current) {
         throwTwoInput.current?.blur()
         onFinish(throwOneInput.current.value, throwTwoInput.current.value)
       }
-    } else if (internalFrameState === 'First Throw') {
+    } else if (description.frameState === 'First Throw') {
       throwOneInput.current?.focus()
     } else {
       throwTwoInput.current?.focus()
     }
-  }, [internalFrameState])
+  }, [description.frameState])
   useEffect(() => {
-    if (isActive && internalFrameState === 'Not Started') {
+    if (isActive && description.frameState === 'Not Started') {
       setFrameState('First Throw')
     }
-  }, [internalFrameState, isActive])
+  }, [description.frameState, isActive])
 
   return (
     <div className='frame'>
       <div className='frame-top'>
         <FrameInput
             dataCy={ `${description.tag}_throw1` }
-            active={internalFrameState === 'First Throw'}
+            active={description.frameState === 'First Throw'}
             inputRef={throwOneInput}
             setFrameState={setFrameState}
             nextFrameState={'Second Throw'}
         />
         <FrameInput
             dataCy={ `${description.tag}_throw2` }
-            active={internalFrameState === 'Second Throw'}
+            active={description.frameState === 'Second Throw'}
             inputRef={throwTwoInput}
             setFrameState={setFrameState}
             nextFrameState={'Done'}
