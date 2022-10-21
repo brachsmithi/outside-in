@@ -4,6 +4,7 @@ import { createFrameDescriptions } from "../functions/initializers";
 import { FrameDescription } from "../models/FrameDescription";
 import './ScoreCardRow.css'
 import { FrameStateEnum } from "../models/stateEnums";
+import { resolveScores } from "../functions/calculation";
 
 export function ScoreCardRow() {
   const [frameDescriptions, setFrameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
@@ -24,10 +25,9 @@ export function ScoreCardRow() {
 
   const updateThrows = (firstThrow: string, secondThrow: string) => {
     setFrameThrows(firstThrow, secondThrow)
-    const previousFrame = (activeFrame.index - 1 >= 0) ? frameDescriptions[activeFrame.index - 1] : null
-    if (secondThrow !== '/') {
-      activeFrame.score = (previousFrame?.score ?? 0) + Number(firstThrow) + Number(secondThrow)
-    }
+    const descriptions = [...frameDescriptions]
+    resolveScores(descriptions)
+    setFrameDescriptions(descriptions)
     if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && activeFrame.index + 1 < frameDescriptions.length) {
       setActiveFrame(frameDescriptions[activeFrame.index + 1])
     }
