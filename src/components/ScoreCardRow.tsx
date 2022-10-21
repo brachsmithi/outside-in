@@ -16,14 +16,14 @@ export function ScoreCardRow() {
     setFrameDescriptions(descriptions)
   }
 
-  function setFrameThrows(firstThrow: string, secondThrow: string) {
+  function setFrameThrows(firstThrow: string, secondThrow: string | null) {
     const descriptions = [...frameDescriptions]
     descriptions[activeFrame.index].firstThrow = firstThrow
     descriptions[activeFrame.index].secondThrow = secondThrow
     setFrameDescriptions(descriptions)
   }
 
-  const updateThrows = (firstThrow: string, secondThrow: string) => {
+  const updateThrows = (firstThrow: string, secondThrow: string | null) => {
     setFrameThrows(firstThrow, secondThrow)
     const descriptions = [...frameDescriptions]
     resolveScores(descriptions)

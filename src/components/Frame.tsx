@@ -8,7 +8,7 @@ import { FrameDescription } from "../models/FrameDescription";
 export type FrameProps = {
   description: FrameDescription
   isActive: boolean
-  updateThrows: (firstThrow: string, secondThrow: string) => void
+  updateThrows: (firstThrow: string, secondThrow: string | null) => void
   setFrameState: (frameState: FrameStateEnum, index: number) => void
 }
 
@@ -35,6 +35,9 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
     } else if (description.frameState === 'First Throw') {
       throwOneInput.current?.focus()
     } else if (description.frameState === 'Second Throw') {
+      if (throwOneInput.current) {
+        updateThrows(throwOneInput.current.value, null)
+      }
       throwTwoInput.current?.focus()
     }
   }, [description.frameState])

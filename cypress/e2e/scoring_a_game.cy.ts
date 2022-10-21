@@ -87,8 +87,8 @@ describe('Scoring a Game', () => {
     expectFrame(7).totalToBe(105)
     expectFrame(8).totalToBe(118)
     expectFrame(9).totalToBe(137)
-    expectFrame(10).totalToBe(156)
-    expectFrame(11).totalToBe(160)
+    expectFrame(10).totalToBe(151)
+    expectFrame(11).totalToBe(155)
   })
 
   it('should not allow invalid data in the game', () => {
