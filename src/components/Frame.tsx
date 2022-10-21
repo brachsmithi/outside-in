@@ -8,42 +8,39 @@ import { FrameDescription } from "../models/FrameDescription";
 export type FrameProps = {
   description: FrameDescription
   isActive: boolean
-  onFinish: (firstThrow: string, secondThrow: string) => void
-  setStateForFrame: (frameState: FrameStateEnum, index: number) => void
+  updateThrows: (firstThrow: string, secondThrow: string) => void
+  setFrameState: (frameState: FrameStateEnum, index: number) => void
 }
 
-export function Frame({description, isActive, onFinish, setStateForFrame}: FrameProps) {
+export function Frame({description, isActive, updateThrows, setFrameState}: FrameProps) {
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
 
-  function setFrameState(frameState: FrameStateEnum) {
-    setStateForFrame(frameState, description.index)
-  }
   useEffect(() => {
     if (description.frameState === 'Done') {
       if (throwOneInput.current && throwTwoInput.current) {
         if (isSecondThrowValid(throwOneInput.current.value, throwTwoInput.current.value)) {
           throwTwoInput.current.blur()
-          onFinish(throwOneInput.current.value, throwTwoInput.current.value)
+          updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
         } else {
           throwTwoInput.current.value = ''
-          setFrameState('Second Throw')
+          setFrameState('Second Throw', description.index)
         }
       }
     } else if (description.frameState === 'Pending') {
       if (throwOneInput.current && throwTwoInput.current) {
         throwTwoInput.current?.blur()
-        onFinish(throwOneInput.current.value, throwTwoInput.current.value)
+        updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
       }
     } else if (description.frameState === 'First Throw') {
       throwOneInput.current?.focus()
-    } else {
+    } else if (description.frameState === 'Second Throw') {
       throwTwoInput.current?.focus()
     }
   }, [description.frameState])
   useEffect(() => {
     if (isActive && description.frameState === 'Not Started') {
-      setFrameState('First Throw')
+      setFrameState('First Throw', description.index)
     }
   }, [description.frameState, isActive])
 
@@ -54,14 +51,14 @@ export function Frame({description, isActive, onFinish, setStateForFrame}: Frame
             dataCy={ `${description.tag}_throw1` }
             active={description.frameState === 'First Throw'}
             inputRef={throwOneInput}
-            setFrameState={setFrameState}
+            setFrameState={(frameState) => setFrameState(frameState, description.index)}
             nextFrameState={'Second Throw'}
         />
         <FrameInput
             dataCy={ `${description.tag}_throw2` }
             active={description.frameState === 'Second Throw'}
             inputRef={throwTwoInput}
-            setFrameState={setFrameState}
+            setFrameState={(frameState) => setFrameState(frameState, description.index)}
             nextFrameState={'Done'}
         />
       </div>

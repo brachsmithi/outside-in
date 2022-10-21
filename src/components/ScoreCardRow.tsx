@@ -14,12 +14,21 @@ export function ScoreCardRow() {
     descriptions[index].frameState = frameState
     setFrameDescriptions(descriptions)
   }
-  const advanceFrame = (firstThrow: string, secondThrow: string) => {
+
+  function setFrameThrows(firstThrow: string, secondThrow: string) {
+    const descriptions = [...frameDescriptions]
+    descriptions[activeFrame.index].firstThrow = firstThrow
+    descriptions[activeFrame.index].secondThrow = secondThrow
+    setFrameDescriptions(descriptions)
+  }
+
+  const updateThrows = (firstThrow: string, secondThrow: string) => {
+    setFrameThrows(firstThrow, secondThrow)
     const previousFrame = (activeFrame.index - 1 >= 0) ? frameDescriptions[activeFrame.index - 1] : null
     if (secondThrow !== '/') {
       activeFrame.score = (previousFrame?.score ?? 0) + Number(firstThrow) + Number(secondThrow)
     }
-    if (activeFrame.index + 1 < frameDescriptions.length) {
+    if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && activeFrame.index + 1 < frameDescriptions.length) {
       setActiveFrame(frameDescriptions[activeFrame.index + 1])
     }
   }
@@ -31,8 +40,8 @@ export function ScoreCardRow() {
                 key={description.tag}
                 description={description}
                 isActive={activeFrame.index === description.index}
-                onFinish={advanceFrame}
-                setStateForFrame={setFrameState}
+                updateThrows={updateThrows}
+                setFrameState={setFrameState}
             />
           })
         }
