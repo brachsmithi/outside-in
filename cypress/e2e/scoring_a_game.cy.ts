@@ -36,7 +36,7 @@ describe('Scoring a Game', () => {
     forFrame(10).throwOneIs(0).throwTwoIs(4).whichTotals(61)
   })
 
-  it.skip('should score a game with spares', () => {
+  it('should score a game with spares', () => {
     function spare() {
       return '/'
     }
