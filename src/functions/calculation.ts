@@ -1,4 +1,5 @@
 import { FrameDescription } from "../models/FrameDescription";
+import { isExtraFrame } from "./analyzers";
 
 export function resolveScores(frameDescriptions: FrameDescription[]) {
   function cumulativeScore(index: number) {
@@ -21,7 +22,7 @@ export function resolveScores(frameDescriptions: FrameDescription[]) {
       if (firstThrowOfNextFrame) {
         description.score = (cumulativeScore(description.index) ?? 0) + 10 + Number(firstThrowOfNextFrame)
       }
-    } else if (description.index === 10 && previousState(description.index) === 'Pending') {
+    } else if (isExtraFrame(description) && previousState(description.index) === 'Pending') {
       if (description.firstThrow) {
         description.score = (cumulativeScore(description.index) ?? 0) + Number(description.firstThrow)
       }
