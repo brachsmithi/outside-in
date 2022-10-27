@@ -1,5 +1,5 @@
 import { createFrameDescriptions } from "./initializers";
-import { resolveScores } from "./calculation";
+import { resolveScores } from "./calculations";
 import { FrameStateEnum } from "../models/stateEnums";
 import { FrameDescription } from "../models/FrameDescription";
 

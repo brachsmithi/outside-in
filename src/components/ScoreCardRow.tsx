@@ -4,7 +4,7 @@ import { createFrameDescriptions } from "../functions/initializers";
 import { FrameDescription } from "../models/FrameDescription";
 import './ScoreCardRow.css'
 import { FrameStateEnum } from "../models/stateEnums";
-import { resolveScores } from "../functions/calculation";
+import { resolveScores } from "../functions/calculations";
 import { isExtraFrame } from "../functions/analyzers";
 
 export function ScoreCardRow() {
