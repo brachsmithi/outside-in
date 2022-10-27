@@ -5,6 +5,7 @@ import { FrameDescription } from "../models/FrameDescription";
 import './ScoreCardRow.css'
 import { FrameStateEnum } from "../models/stateEnums";
 import { resolveScores } from "../functions/calculation";
+import { isExtraFrame } from "../functions/analyzers";
 
 export function ScoreCardRow() {
   const [frameDescriptions, setFrameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
@@ -30,6 +31,8 @@ export function ScoreCardRow() {
     setFrameDescriptions(descriptions)
     if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && activeFrame.index + 1 < frameDescriptions.length) {
       setActiveFrame(frameDescriptions[activeFrame.index + 1])
+    } else if (isExtraFrame(activeFrame)) {
+      setFrameState('Done', activeFrame.index)
     }
   }
   return (

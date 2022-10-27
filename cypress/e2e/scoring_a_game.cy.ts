@@ -51,6 +51,9 @@ describe('Scoring a Game', () => {
           return {
             throwTwoIs(pinsKnockedDown2: string) {
               rollBall(2, pinsKnockedDown2)
+            },
+            throwTwoIsDisabled() {
+              cy.get(`input[data-cy="${ label }_throw2"]`).should('be.disabled')
             }
           }
         }
@@ -76,7 +79,7 @@ describe('Scoring a Game', () => {
     forFrame(8).throwOneIs(7).throwTwoIs(spare())
     forFrame(9).throwOneIs(3).throwTwoIs(spare())
     forFrame(10).throwOneIs(9).throwTwoIs(spare())
-    forFrame(11).throwOneIs(4)
+    forFrame(11).throwOneIs(4).throwTwoIsDisabled()
 
     expectFrame(1).totalToBe(16)
     expectFrame(2).totalToBe(29)
