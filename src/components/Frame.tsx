@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './Frame.css'
 import { FrameInput } from "./FrameInput";
-import { isSecondThrowValid } from "../functions/validators";
+import { isFirstThrowValid, isSecondThrowValid } from "../functions/validators";
 import { FrameStateEnum } from "../models/stateEnums";
 import { FrameDescription } from "../models/FrameDescription";
 
@@ -29,8 +29,13 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
       }
     } else if (description.frameState === 'Pending') {
       if (throwOneInput.current && throwTwoInput.current) {
-        throwTwoInput.current?.blur()
-        updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
+        if (isFirstThrowValid(throwOneInput.current.value)) {
+          throwTwoInput.current?.blur()
+          updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
+        } else {
+          throwOneInput.current.value = ''
+          setFrameState('First Throw', description.index)
+        }
       }
     } else if (description.frameState === 'First Throw') {
       throwOneInput.current?.focus()

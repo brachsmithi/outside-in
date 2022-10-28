@@ -136,6 +136,7 @@ describe('Scoring a Game', () => {
     forFrame(1).throwOneIs('8').throwTwoIs('9').andIsReadyForInput()
     forFrame(1).throwTwoIs('w').andIsReadyForInput()
     forFrame(1).throwTwoIs('1').whichTotals(9)
+    forFrame(2).throwOneIs('/').andIsReadyForInput()
   })
 
 })
