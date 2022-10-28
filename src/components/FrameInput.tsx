@@ -6,15 +6,16 @@ import { FrameStateEnum } from "../models/stateEnums";
 export type FrameInputProps = {
   inputRef: RefObject<HTMLInputElement>
   active: boolean
+  isValidForThrow: (value: string) => boolean
   setFrameState: (state: FrameStateEnum) => void
   nextFrameState: FrameStateEnum
   dataCy: string
 }
 
-export function FrameInput({inputRef, active, setFrameState, nextFrameState, dataCy}: FrameInputProps) {
+export function FrameInput({inputRef, active, isValidForThrow, setFrameState, nextFrameState, dataCy}: FrameInputProps) {
   const changeHandler = () => {
     if (inputRef.current?.value) {
-      if (isCharacterValid(inputRef.current?.value)) {
+      if (isCharacterValid(inputRef.current?.value) && isValidForThrow(inputRef.current?.value)) {
         if (inputRef.current?.value === '/') {
           setFrameState('Pending')
         } else {

@@ -19,23 +19,13 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
   useEffect(() => {
     if (description.frameState === 'Done') {
       if (throwOneInput.current && throwTwoInput.current) {
-        if (isSecondThrowValid(throwOneInput.current.value, throwTwoInput.current.value)) {
-          throwTwoInput.current.blur()
-          updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
-        } else {
-          throwTwoInput.current.value = ''
-          setFrameState('Second Throw', description.index)
-        }
+        throwTwoInput.current.blur()
+        updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
       }
     } else if (description.frameState === 'Pending') {
       if (throwOneInput.current && throwTwoInput.current) {
-        if (isFirstThrowValid(throwOneInput.current.value)) {
-          throwTwoInput.current?.blur()
-          updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
-        } else {
-          throwOneInput.current.value = ''
-          setFrameState('First Throw', description.index)
-        }
+        throwTwoInput.current?.blur()
+        updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
       }
     } else if (description.frameState === 'First Throw') {
       throwOneInput.current?.focus()
@@ -59,6 +49,7 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
             dataCy={ `${description.tag}_throw1` }
             active={description.frameState === 'First Throw'}
             inputRef={throwOneInput}
+            isValidForThrow={isFirstThrowValid}
             setFrameState={(frameState) => setFrameState(frameState, description.index)}
             nextFrameState={'Second Throw'}
         />
@@ -66,6 +57,7 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
             dataCy={ `${description.tag}_throw2` }
             active={description.frameState === 'Second Throw'}
             inputRef={throwTwoInput}
+            isValidForThrow={(value: string) => isSecondThrowValid(throwOneInput.current?.value ?? '', value)}
             setFrameState={(frameState) => setFrameState(frameState, description.index)}
             nextFrameState={'Done'}
         />
