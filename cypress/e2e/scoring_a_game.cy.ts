@@ -5,6 +5,9 @@ describe('Scoring a Game', () => {
       function rollBall(throwNumber: number, pinsKnockedDown) {
         cy.get(`input[data-cy="${ label }_throw${throwNumber}"]`).should('have.focus').type(String(pinsKnockedDown)).should('not.have.focus').should('be.disabled')
       }
+      function throwIsDisabled(throwNumber: number) {
+        cy.get(`input[data-cy="${ label }_throw${ throwNumber }"]`).should('not.have.focus').should('be.disabled')
+      }
       return {
         throwOneIs(pinsKnockedDown1: number) {
           rollBall(1, pinsKnockedDown1)
@@ -16,6 +19,14 @@ describe('Scoring a Game', () => {
                   cy.get(`[data-cy="${ label }_total"]`).should('have.text', String(expectedTotal))
                 }
               }
+            }
+          }
+        },
+        throwOneIsDisabled() {
+          throwIsDisabled(1)
+          return {
+            throwTwoIsDisabled() {
+              throwIsDisabled(2)
             }
           }
         }
@@ -34,6 +45,7 @@ describe('Scoring a Game', () => {
     forFrame(8).throwOneIs(6).throwTwoIs(0).whichTotals(49)
     forFrame(9).throwOneIs(7).throwTwoIs(1).whichTotals(57)
     forFrame(10).throwOneIs(0).throwTwoIs(4).whichTotals(61)
+    forFrame(11).throwOneIsDisabled().throwTwoIsDisabled()
   })
 
   it('should score a game with spares', () => {

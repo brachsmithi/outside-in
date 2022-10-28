@@ -5,11 +5,11 @@ import { FrameDescription } from "../models/FrameDescription";
 import './ScoreCardRow.css'
 import { FrameStateEnum } from "../models/stateEnums";
 import { resolveScores } from "../functions/calculations";
-import { isExtraFrame } from "../functions/analyzers";
+import { isExtraFrame, isLastFrame } from "../functions/analyzers";
 
 export function ScoreCardRow() {
   const [frameDescriptions, setFrameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
-  const [activeFrame, setActiveFrame] = useState<FrameDescription>(frameDescriptions[0])
+  const [activeFrame, setActiveFrame] = useState<FrameDescription | null>(frameDescriptions[0])
 
   function setFrameState(frameState: FrameStateEnum, index: number) {
     const descriptions = [...frameDescriptions]
@@ -18,10 +18,12 @@ export function ScoreCardRow() {
   }
 
   function setFrameThrows(firstThrow: string, secondThrow: string | null) {
-    const descriptions = [...frameDescriptions]
-    descriptions[activeFrame.index].firstThrow = firstThrow
-    descriptions[activeFrame.index].secondThrow = secondThrow
-    setFrameDescriptions(descriptions)
+    if (activeFrame) {
+      const descriptions = [ ...frameDescriptions ]
+      descriptions[activeFrame.index].firstThrow = firstThrow
+      descriptions[activeFrame.index].secondThrow = secondThrow
+      setFrameDescriptions(descriptions)
+    }
   }
 
   const updateThrows = (firstThrow: string, secondThrow: string | null) => {
@@ -29,10 +31,14 @@ export function ScoreCardRow() {
     const descriptions = [...frameDescriptions]
     resolveScores(descriptions)
     setFrameDescriptions(descriptions)
-    if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && activeFrame.index + 1 < frameDescriptions.length) {
-      setActiveFrame(frameDescriptions[activeFrame.index + 1])
-    } else if (isExtraFrame(activeFrame)) {
-      setFrameState('Done', activeFrame.index)
+    if (activeFrame) {
+      if (activeFrame.frameState === 'Done' && isLastFrame(activeFrame)) {
+        setActiveFrame(null)
+      } else if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && activeFrame.index + 1 < frameDescriptions.length) {
+        setActiveFrame(frameDescriptions[activeFrame.index + 1])
+      } else if (isExtraFrame(activeFrame)) {
+        setFrameState('Done', activeFrame.index)
+      }
     }
   }
   return (
@@ -42,7 +48,7 @@ export function ScoreCardRow() {
             return <Frame
                 key={description.tag}
                 description={description}
-                isActive={activeFrame.index === description.index}
+                isActive={activeFrame?.index === description.index}
                 updateThrows={updateThrows}
                 setFrameState={setFrameState}
             />
