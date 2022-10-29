@@ -59,6 +59,8 @@ Now we tackle some scoring complexity by allowing the entry of spares.
 
 Having incorporated spares, we now proceed to strikes.
 
+[View step details](steps/step_four.md)
+
 ## Learn More
 
 **Cypress** - The documentation at [docs.cypress.io](https://docs.cypress.io/) is good and reasonably thorough. It's a good place to start for help and information about using Cypress.
