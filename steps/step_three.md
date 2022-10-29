@@ -1745,3 +1745,5 @@ Then the conditional can be changed to use this function.
 And with that, we are *finally* done with scoring spares!
 
 ![Bug Fixed](images/s3/s3_bug_fixed.png)
+
+Time to handle strikes! On to [Step Four](step_four.md)
