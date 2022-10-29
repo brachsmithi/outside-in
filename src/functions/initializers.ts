@@ -1,8 +1,13 @@
 import { FrameDescription } from "../models/FrameDescription";
+import { Configuration } from "../models/Configuration";
+
+export const configuration: Configuration = {
+  frameCount: 10
+}
 
 export function createFrameDescriptions(): FrameDescription[] {
   const descriptions: FrameDescription[] = []
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < configuration.frameCount; i++) {
     descriptions.push({
       index: i,
       tag: `frame${i + 1}`,

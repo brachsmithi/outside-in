@@ -44,8 +44,7 @@ describe('Scoring a Game', () => {
     forFrame(7).throwOneIs(3).throwTwoIs(2).whichTotals(43)
     forFrame(8).throwOneIs(6).throwTwoIs(0).whichTotals(49)
     forFrame(9).throwOneIs(7).throwTwoIs(1).whichTotals(57)
-    forFrame(10).throwOneIs(0).throwTwoIs(4).whichTotals(61)
-    forFrame(11).throwOneIsDisabled().throwTwoIsDisabled()
+    forFrame(10).throwOneIsDisabled().throwTwoIsDisabled()
   })
 
   it('should score a game with spares', () => {
@@ -90,8 +89,7 @@ describe('Scoring a Game', () => {
     forFrame(7).throwOneIs(6).throwTwoIs(spare())
     forFrame(8).throwOneIs(7).throwTwoIs(spare())
     forFrame(9).throwOneIs(3).throwTwoIs(spare())
-    forFrame(10).throwOneIs(9).throwTwoIs(spare())
-    forFrame(11).throwOneIs(4).throwTwoIsDisabled()
+    forFrame(10).throwOneIs(4).throwTwoIsDisabled()
 
     expectFrame(1).totalToBe(16)
     expectFrame(2).totalToBe(29)
@@ -101,9 +99,8 @@ describe('Scoring a Game', () => {
     expectFrame(6).totalToBe(88)
     expectFrame(7).totalToBe(105)
     expectFrame(8).totalToBe(118)
-    expectFrame(9).totalToBe(137)
-    expectFrame(10).totalToBe(151)
-    expectFrame(11).totalToBe(155)
+    expectFrame(9).totalToBe(132)
+    expectFrame(10).totalToBe(136)
   })
 
   it('should not allow invalid data in the game', () => {

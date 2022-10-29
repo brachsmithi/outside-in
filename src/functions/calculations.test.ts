@@ -67,7 +67,7 @@ describe('calculations', () => {
       assertScores(descriptions, [13])
     })
 
-    it('should resolve the 11th frame when there is one throw following a spare', () => {
+    it('should resolve the extra frame when there is one throw following a spare', () => {
       const descriptions = frameDescriptions()
       setFrame(descriptions[0], 'Done', '1', '0')
       setFrame(descriptions[1], 'Done', '3', '2')
@@ -77,13 +77,12 @@ describe('calculations', () => {
       setFrame(descriptions[5], 'Done', '3', '2')
       setFrame(descriptions[6], 'Done', '2', '1')
       setFrame(descriptions[7], 'Done', '4', '2')
-      setFrame(descriptions[8], 'Done', '5', '3')
-      setFrame(descriptions[9], 'Pending', '8', '/')
-      setFrame(descriptions[10], 'Second Throw', '3')
+      setFrame(descriptions[8], 'Pending', '5', '/')
+      setFrame(descriptions[9], 'Second Throw', '3')
 
       resolveScores(descriptions)
 
-      assertScores(descriptions, [1, 6, 12, 15, 21, 26, 29, 35, 43, 56, 59])
+      assertScores(descriptions, [1, 6, 12, 15, 21, 26, 29, 35, 48, 51])
     })
   })
 })
