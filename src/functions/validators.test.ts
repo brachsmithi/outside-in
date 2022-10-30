@@ -3,12 +3,18 @@ import { isCharacterValid, isSecondThrowValid } from "./validators";
 
 describe('validator tests', () => {
   describe('isCharacterValid', () => {
-    it('should allow single digits and spares', () => {
+    it('should allow single digits, spares, and strikes', () => {
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (num: number) => {
         return isCharacterValid(num.toString())
       }), {numRuns: 10, skipEqualValues: true})
       fc.assert(fc.property(fc.constant('/'), (slash: string) => {
         return isCharacterValid(slash)
+      }))
+      fc.assert(fc.property(fc.constant('x'), (strike: string) => {
+        return isCharacterValid(strike)
+      }))
+      fc.assert(fc.property(fc.constant('X'), (strike: string) => {
+        return isCharacterValid(strike)
       }))
     })
 
@@ -26,7 +32,7 @@ describe('validator tests', () => {
 
     it('should not allow non-numeric characters', () => {
       const nonNumericPattern = new RegExp('\\D')
-      fc.assert(fc.property(fc.char().filter(t => nonNumericPattern.test(t) && t !== '/'), (value: string) => {
+      fc.assert(fc.property(fc.char().filter(t => nonNumericPattern.test(t) && !['/', 'x', 'X'].includes(t)), (value: string) => {
         return !isCharacterValid(value)
       }), {numRuns: 30, skipEqualValues: true})
     })

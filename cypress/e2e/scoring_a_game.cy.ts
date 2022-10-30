@@ -103,6 +103,20 @@ describe('Scoring a Game', () => {
     expectFrame(10).totalToBe(136)
   })
 
+  it('should score a game with strikes', () => {
+    function forFrame(frameNumber: number) {
+      const label = `frame${frameNumber}`
+      return {
+        enterStrike() {
+          cy.get(`input[data-cy="${ label }_throw1"]`).should('have.focus').type('x').should('not.have.focus').should('be.disabled')
+        }
+      }
+    }
+    cy.visit('/')
+
+    forFrame(1).enterStrike()
+  })
+
   it('should not allow invalid data in the game', () => {
     function forFrame(frameNumber: number) {
       const label = `frame${frameNumber}`
@@ -147,5 +161,4 @@ describe('Scoring a Game', () => {
     forFrame(1).throwTwoIs('1').whichTotals(9)
     forFrame(2).throwOneIs('/').andIsReadyForInput()
   })
-
 })

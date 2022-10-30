@@ -1,5 +1,5 @@
 export function isCharacterValid(char: string): boolean {
-  return new RegExp('^[\\d\\/]$').test(char)
+  return new RegExp('^[\\d\\/xX]$').test(char)
 }
 
 export function isFirstThrowValid(firstThrow: string) {
