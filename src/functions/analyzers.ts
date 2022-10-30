@@ -8,3 +8,7 @@ export function isExtraFrame(description: FrameDescription) {
 export function isLastFrame(description: FrameDescription) {
   return description.index === configuration.frameCount - 2
 }
+
+export function requiresSpecialScoring(value: string) {
+  return value === '/' || value === 'x' || value === 'X'
+}

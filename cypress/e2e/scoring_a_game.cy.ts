@@ -115,6 +115,15 @@ describe('Scoring a Game', () => {
     cy.visit('/')
 
     forFrame(1).enterStrike()
+    forFrame(2).enterStrike()
+    forFrame(3).enterStrike()
+    forFrame(4).enterStrike()
+    forFrame(5).enterStrike()
+    forFrame(6).enterStrike()
+    forFrame(7).enterStrike()
+    forFrame(8).enterStrike()
+    forFrame(9).enterStrike()
+    forFrame(10).enterStrike()
   })
 
   it('should not allow invalid data in the game', () => {

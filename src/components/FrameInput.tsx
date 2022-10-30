@@ -2,6 +2,7 @@ import { RefObject } from "react";
 import { isCharacterValid } from "../functions/validators";
 import './FrameInput.css'
 import { FrameStateEnum } from "../models/stateEnums";
+import { requiresSpecialScoring } from "../functions/analyzers";
 
 export type FrameInputProps = {
   inputRef: RefObject<HTMLInputElement>
@@ -16,7 +17,7 @@ export function FrameInput({inputRef, active, isValidForThrow, setFrameState, ne
   const changeHandler = () => {
     if (inputRef.current?.value) {
       if (isCharacterValid(inputRef.current?.value) && isValidForThrow(inputRef.current?.value)) {
-        if (inputRef.current?.value === '/') {
+        if (requiresSpecialScoring(inputRef.current.value)) {
           setFrameState('Pending')
         } else {
           setFrameState(nextFrameState)
