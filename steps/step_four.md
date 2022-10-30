@@ -178,3 +178,127 @@ Is this test still useful? It helped us to create the function under test, but t
 This is still a brittle test. If the number of frames changes again, this will need another adjustment. We could invest in making the test more dynamic, generating data to fill in the appropriate number of frames based on the configuration so that we don't need to be dependent on knowing how many frames there are. That's a good solution for unit tests that need to adapt to a changing system, but now that we have the correct number of frames this shouldn't change again, and this test module will be deleted once the strike calculation is working anyway.
 
 We're ready to move on to adding strikes!
+
+## Allow Strike to Be Entered
+
+Our first task states
+> Allow an 'X' to be entered in the first throw. This includes making the focus shift to the next frame. By the end of this task, a game should be able to have a strike in every frame, including the extra frame.
+
+We'll need a new end-to-end test.
+
+    it('should score a game with strikes', () => {
+      function forFrame(frameNumber: number) {
+        const label = `frame${frameNumber}`
+        return {
+          enterStrike() {
+            cy.get(`input[data-cy="${ label }_throw1"]`).should('have.focus').type('x').should('not.have.focus').should('be.disabled')
+          }
+        }
+      }
+      cy.visit('/')
+
+      forFrame(1).enterStrike()
+    })
+
+It fails for the reason we expect, so we need to first allow entry of the strike character. It's represented in a scoresheet by an 'X'. We used a lowercase 'x' in the test, and we should allow either to be used. To the validator tests!
+
+    it('should allow single digits, spares, and strikes', () => {
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (num: number) => {
+        return isCharacterValid(num.toString())
+      }), {numRuns: 10, skipEqualValues: true})
+      fc.assert(fc.property(fc.constant('/'), (slash: string) => {
+        return isCharacterValid(slash)
+      }))
+      fc.assert(fc.property(fc.constant('x'), (strike: string) => {
+        return isCharacterValid(strike)
+      }))
+      fc.assert(fc.property(fc.constant('X'), (strike: string) => {
+        return isCharacterValid(strike)
+      }))
+    })
+    ...
+    it('should not allow non-numeric characters', () => {
+      const nonNumericPattern = new RegExp('\\D')
+      fc.assert(fc.property(fc.char().filter(t => nonNumericPattern.test(t) && !['/', 'x', 'X'].includes(t)), (value: string) => {
+        return !isCharacterValid(value)
+      }), {numRuns: 30, skipEqualValues: true})
+    })
+
+The first test fails because we haven't changed the code yet. The second would have failed after the change, but we change it now to properly update our expectations. We just need to add few characters to our RegExp pattern.
+
+    export function isCharacterValid(char: string): boolean {
+      return new RegExp('^[\\d\\/xX]$').test(char)
+    }
+
+Our unit tests and end-to-end tests all pass!
+
+We still need to change the focus to the next frame before the task is complete, but let's not forget to lock down strikes to only be valid for the front end. We'll add an assertion to our validators tests. Second frame validation is tricky enough, so we'll use the unit tests.
+
+    it('should not allow a strike in the second frame', () => {
+      expect(isSecondThrowValid('1', 'x')).toBeFalsy()
+      expect(isSecondThrowValid('1', 'X')).toBeFalsy()
+    })
+
+Ready for the scary part? This passes with no code change. Why? Because the implementation casts the throw's value as a number, which for the x characters returns NaN. Adding a number to NaN is also NaN, which is not less than or equal to 9, which return false, which is exactly what we want! Is it clear from the code that this is excluding second frame strikes? Not unless you know way too much about Javascript. But at least we have a test that verifies the behavior we expect. I'd say it's probably fine to add a check for clarity, but I'm not going to bother since we have test coverage--particularly as we'll soon be changing this function to explicitly allow a second input strike in the extra frame under some circumstances.
+
+Now we can return to the matter of advancing the frame.
+
+We can mark the frame as Pending, and we'll see where that gets us. First, though, we need to add another assertion to our end-to-end test.
+
+    forFrame(1).enterStrike()
+    forFrame(2).enterStrike()
+
+Part of our `enterStrike` implementation is to assert that the first input of the frame is in focus. This fails for the second frame, which is all that we need to get to work. We'll add a condition in the FrameInput change handler.
+
+    const changeHandler = () => {
+      if (inputRef.current?.value) {
+        if (isCharacterValid(inputRef.current?.value) && isValidForThrow(inputRef.current?.value)) {
+          if (inputRef.current?.value === '/' || inputRef.current?.value === 'x' || inputRef.current?.value === 'X') {
+            setFrameState('Pending')
+          } else {
+            setFrameState(nextFrameState)
+          }
+        } else {
+          inputRef.current.value = ''
+        }
+      }
+    }
+
+This makes our test pass! That was pretty simple. This is a clunky condition, though, especially with the two representations of strikes. We can extract this logic to an analyzer.
+
+    export function requiresSpecialScoring(value: string) {
+      return value === '/' || value === 'x' || value === 'X'
+    }
+
+Like the other analyzers, this is simple enough to not require an explicit test. It's functionality is implicitly tested by the end-to-end tests functioning. Now we can replace the 'Pending' condition in FrameInput.
+
+    const changeHandler = () => {
+      if (inputRef.current?.value) {
+        if (isCharacterValid(inputRef.current?.value) && isValidForThrow(inputRef.current?.value)) {
+          if (requiresSpecialScoring(inputRef.current.value)) {
+            setFrameState('Pending')
+          } else {
+            setFrameState(nextFrameState)
+          }
+        } else {
+          inputRef.current.value = ''
+        }
+      }
+    }
+
+That's better. One more word on this. The name `requiresSpecialScoring` violates the usual convention for naming boolean functions. That's intentional. Conventions are useful, but not at the expense of clarity. I couldn't find an `is` phrase that worked, and 'requires' has the same boolean statefulness to read similarly.
+
+There's just one thing left to finish this task. We need to have a test that successfully puts 10 strikes into the scorecard.
+
+    forFrame(1).enterStrike()
+    forFrame(2).enterStrike()
+    forFrame(3).enterStrike()
+    forFrame(4).enterStrike()
+    forFrame(5).enterStrike()
+    forFrame(6).enterStrike()
+    forFrame(7).enterStrike()
+    forFrame(8).enterStrike()
+    forFrame(9).enterStrike()
+    forFrame(10).enterStrike()
+
+It works! Adding assertions that already work is not the way TDD is supposed to work, but this was a happy accident. We'll need these entries for the next task, so that's alright.
