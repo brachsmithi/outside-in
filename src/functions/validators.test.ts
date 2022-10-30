@@ -76,7 +76,7 @@ describe('validator tests', () => {
       return throwGenerator({min: 1, max: 9}, {min: (first: number) => 10 - first, max: (_: number) => 9})
     }
 
-    it('should allow totals over 10 or a spare', () => {
+    it('should allow totals under 10 or a spare', () => {
         fc.assert(fc.property(generateValidThrows(), (pinCounts: string[]) => {
         return isSecondThrowValid(pinCounts[0], pinCounts[1])
       }), {numRuns: 20, skipEqualValues: true})
@@ -89,6 +89,11 @@ describe('validator tests', () => {
       fc.assert(fc.property(generateInvalidThrows(), (pinCounts: string[]) => {
         return !isSecondThrowValid(pinCounts[0], pinCounts[1])
       }), {numRuns: 20, skipEqualValues: true})
+    })
+
+    it('should not allow a strike in the second frame', () => {
+      expect(isSecondThrowValid('1', 'x')).toBeFalsy()
+      expect(isSecondThrowValid('1', 'X')).toBeFalsy()
     })
   })
 })
