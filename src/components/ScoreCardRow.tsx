@@ -32,7 +32,7 @@ export function ScoreCardRow() {
     resolveScores(descriptions)
     setFrameDescriptions(descriptions)
     if (activeFrame) {
-      if (activeFrame.frameState === 'Done' && isLastFrame(activeFrame)) {
+      if (activeFrame.frameState === 'Done' && (isLastFrame(activeFrame) || isExtraFrame(activeFrame))) {
         setActiveFrame(null)
       } else if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && !isExtraFrame(activeFrame)) {
         setActiveFrame(frameDescriptions[activeFrame.index + 1])
@@ -41,7 +41,11 @@ export function ScoreCardRow() {
         if (isSpare(previousFrame.secondThrow) && activeFrame.frameState === 'Second Throw') {
           setFrameState('Done', activeFrame.index)
         } else if (isStrike(previousFrame.firstThrow)) {
-          setFrameState('Second Throw', activeFrame.index)
+          if (secondThrow) {
+            setFrameState('Done', activeFrame.index)
+          } else {
+            setFrameState('Second Throw', activeFrame.index)
+          }
         }
       }
     }
