@@ -34,10 +34,15 @@ export function ScoreCardRow() {
     if (activeFrame) {
       if (activeFrame.frameState === 'Done' && isLastFrame(activeFrame)) {
         setActiveFrame(null)
-      } else if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && activeFrame.index + 1 < frameDescriptions.length) {
+      } else if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && !isExtraFrame(activeFrame)) {//activeFrame.index + 1 < frameDescriptions.length) {
         setActiveFrame(frameDescriptions[activeFrame.index + 1])
       } else if (isExtraFrame(activeFrame)) {
-        setFrameState('Done', activeFrame.index)
+        const previousFrame = descriptions[activeFrame.index - 1]
+        if (previousFrame.secondThrow === '/' && activeFrame.frameState === 'Second Throw') {
+          setFrameState('Done', activeFrame.index)
+        } else if (previousFrame.firstThrow === 'x' || previousFrame.firstThrow === 'X') {
+          setFrameState('Second Throw', activeFrame.index)
+        }
       }
     }
   }

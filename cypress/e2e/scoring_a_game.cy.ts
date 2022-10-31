@@ -103,15 +103,29 @@ describe('Scoring a Game', () => {
     expectFrame(10).totalToBe(136)
   })
 
-  it('should score a game with strikes', () => {
+  it.skip('should score a game with strikes', () => {
     function forFrame(frameNumber: number) {
       const label = `frame${frameNumber}`
+      function throwStrike(throwNumber: number) {
+        cy.get(`input[data-cy="${ label }_throw${throwNumber}"]`).should('have.focus').type('x').should('not.have.focus').should('be.disabled')
+      }
       return {
         enterStrike() {
-          cy.get(`input[data-cy="${ label }_throw1"]`).should('have.focus').type('x').should('not.have.focus').should('be.disabled')
+          throwStrike(1)
+        },
+        enterSecondStrike() {
+          throwStrike(2)
         }
       }
     }
+    function expectFrame(frameNumber: number) {
+      return {
+        totalToBe(total: number) {
+          cy.get(`[data-cy="frame${ frameNumber }_total"]`).should('have.text', String(total))
+        }
+      }
+    }
+
     cy.visit('/')
 
     forFrame(1).enterStrike()
@@ -124,6 +138,17 @@ describe('Scoring a Game', () => {
     forFrame(8).enterStrike()
     forFrame(9).enterStrike()
     forFrame(10).enterStrike()
+    forFrame(10).enterSecondStrike()
+
+    expectFrame(1).totalToBe(30)
+    expectFrame(2).totalToBe(60)
+    expectFrame(3).totalToBe(90)
+    expectFrame(4).totalToBe(120)
+    expectFrame(5).totalToBe(150)
+    expectFrame(6).totalToBe(180)
+    expectFrame(7).totalToBe(210)
+    expectFrame(8).totalToBe(240)
+    expectFrame(9).totalToBe(270)
   })
 
   it('should not allow invalid data in the game', () => {

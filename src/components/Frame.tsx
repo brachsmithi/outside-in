@@ -19,12 +19,10 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
   useEffect(() => {
     if (description.frameState === 'Done') {
       if (throwOneInput.current && throwTwoInput.current) {
-        throwTwoInput.current.blur()
         updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
       }
     } else if (description.frameState === 'Pending') {
       if (throwOneInput.current && throwTwoInput.current) {
-        throwTwoInput.current?.blur()
         updateThrows(throwOneInput.current.value, throwTwoInput.current.value)
       }
     } else if (description.frameState === 'First Throw') {
