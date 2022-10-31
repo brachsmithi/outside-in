@@ -8,7 +8,7 @@ export function isFirstThrowValid(firstThrow: string) {
   return !isSpare(firstThrow)
 }
 
-export function isSecondThrowValid(firstThrow: string, secondThrow: string, mayHaveSecondStrike: boolean = false): boolean {
+export function isSecondThrowValid(firstThrow: string, secondThrow: string, mayHaveSecondStrike: boolean): boolean {
   if (isSpare(secondThrow) || (isStrike(secondThrow) && isStrikeValid(mayHaveSecondStrike, firstThrow))) {
     return true
   } else{

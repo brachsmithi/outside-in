@@ -78,22 +78,34 @@ describe('validator tests', () => {
 
     it('should allow totals under 10 or a spare', () => {
         fc.assert(fc.property(generateValidThrows(), (pinCounts: string[]) => {
-        return isSecondThrowValid(pinCounts[0], pinCounts[1])
+        return isSecondThrowValid(pinCounts[0], pinCounts[1], false)
       }), {numRuns: 20, skipEqualValues: true})
       fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
-        return isSecondThrowValid(String(firstThrow), '/')
+        return isSecondThrowValid(String(firstThrow), '/', false)
+                && isSecondThrowValid(String(firstThrow), '/', true)
       }))
     })
 
     it('should not allow totals over 10', () => {
       fc.assert(fc.property(generateInvalidThrows(), (pinCounts: string[]) => {
-        return !isSecondThrowValid(pinCounts[0], pinCounts[1])
+        return !isSecondThrowValid(pinCounts[0], pinCounts[1], false)
+                && !isSecondThrowValid(pinCounts[0], pinCounts[1], true)
       }), {numRuns: 20, skipEqualValues: true})
     })
 
     it('should not allow a strike in the second throw for normal frame', () => {
-      expect(isSecondThrowValid('1', 'x')).toBeFalsy()
-      expect(isSecondThrowValid('1', 'X')).toBeFalsy()
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
+        return !isSecondThrowValid(String(firstThrow), 'x', false)
+                && !isSecondThrowValid(String(firstThrow), 'X', false)
+      }), {numRuns: 10, skipEqualValues: true})
+      fc.assert(fc.property(fc.constant('x'), (strike: string) => {
+        return !isSecondThrowValid(strike, 'x', false)
+                && !isSecondThrowValid(strike, 'X', false)
+      }))
+      fc.assert(fc.property(fc.constant('X'), (strike: string) => {
+        return !isSecondThrowValid(strike, 'x', false)
+            && !isSecondThrowValid(strike, 'X', false)
+      }))
     })
 
     it('should allow a strike in the second throw for an extra frame', () => {
@@ -102,8 +114,10 @@ describe('validator tests', () => {
     })
 
     it("should not allow a strike in the second throw of an extra frame when there aren't 10 pins to knock down", () => {
-      expect(isSecondThrowValid('1', 'x', true)).toBeFalsy()
-      expect(isSecondThrowValid('1', 'X', true)).toBeFalsy()
+      fc.assert(fc.property(fc.integer({min: 0, max: 9}), (firstThrow: number) => {
+        return !isSecondThrowValid(String(firstThrow), 'x', true)
+            && !isSecondThrowValid(String(firstThrow), 'X', true)
+      }), {numRuns: 10, skipEqualValues: true})
     })
   })
 })
