@@ -67,6 +67,64 @@ describe('calculations', () => {
       assertScores(descriptions, [13])
     })
 
+    it('should leave a strike unresolved when next frame has no second throw', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Pending', 'x')
+      setFrame(descriptions[1], 'Second Throw', '6')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [])
+    })
+
+    it('should resolve a strike when next frame has two throws', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Pending', 'x')
+      setFrame(descriptions[1], 'Done', '4', '3')
+      setFrame(descriptions[2], 'First Throw')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [17, 24])
+    })
+
+    it('should resolve a strike when next frame has another strike', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Pending', 'x')
+      setFrame(descriptions[1], 'Pending', 'X')
+      setFrame(descriptions[2], 'Done', '5', '4')
+      setFrame(descriptions[3], 'First Throw')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [25, 44, 53])
+    })
+
+    it('should resolve a strike when next frame is a spare', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Pending', 'x')
+      setFrame(descriptions[1], 'Pending', '5', '/')
+      setFrame(descriptions[2], 'Done', '8', '1')
+      setFrame(descriptions[3], 'First Throw')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [20, 38, 47])
+    })
+
+    it('should resolve a strike followed by two strikes', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Pending', 'x')
+      setFrame(descriptions[1], 'Pending', 'X')
+      setFrame(descriptions[2], 'Pending', 'x')
+      setFrame(descriptions[3], 'Done', '4', '2')
+      setFrame(descriptions[4], 'First Throw')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [30, 54, 70, 76])
+    })
+
     it('should resolve the extra frame when there is one throw following a spare', () => {
       const descriptions = frameDescriptions()
       setFrame(descriptions[0], 'Done', '1', '0')
