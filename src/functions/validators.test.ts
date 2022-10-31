@@ -91,9 +91,19 @@ describe('validator tests', () => {
       }), {numRuns: 20, skipEqualValues: true})
     })
 
-    it('should not allow a strike in the second frame', () => {
+    it('should not allow a strike in the second throw for normal frame', () => {
       expect(isSecondThrowValid('1', 'x')).toBeFalsy()
       expect(isSecondThrowValid('1', 'X')).toBeFalsy()
+    })
+
+    it('should allow a strike in the second throw for an extra frame', () => {
+      expect(isSecondThrowValid('x', 'x', true)).toBeTruthy()
+      expect(isSecondThrowValid('X', 'X', true)).toBeTruthy()
+    })
+
+    it("should not allow a strike in the second throw of an extra frame when there aren't 10 pins to knock down", () => {
+      expect(isSecondThrowValid('1', 'x', true)).toBeFalsy()
+      expect(isSecondThrowValid('1', 'X', true)).toBeFalsy()
     })
   })
 })

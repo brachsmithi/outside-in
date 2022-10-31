@@ -10,5 +10,13 @@ export function isLastFrame(description: FrameDescription) {
 }
 
 export function requiresSpecialScoring(value: string) {
-  return value === '/' || value === 'x' || value === 'X'
+  return isSpare(value) || isStrike(value)
+}
+
+export function isSpare(value: string | null) {
+  return value === '/'
+}
+
+export function isStrike(value: string | null) {
+  return value === 'x' || value === 'X'
 }

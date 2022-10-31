@@ -4,6 +4,7 @@ import { FrameInput } from "./FrameInput";
 import { isFirstThrowValid, isSecondThrowValid } from "../functions/validators";
 import { FrameStateEnum } from "../models/stateEnums";
 import { FrameDescription } from "../models/FrameDescription";
+import { isExtraFrame } from "../functions/analyzers";
 
 export type FrameProps = {
   description: FrameDescription
@@ -55,7 +56,7 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
             dataCy={ `${description.tag}_throw2` }
             active={description.frameState === 'Second Throw'}
             inputRef={throwTwoInput}
-            isValidForThrow={(value: string) => isSecondThrowValid(throwOneInput.current?.value ?? '', value)}
+            isValidForThrow={(value: string) => isSecondThrowValid(throwOneInput.current?.value ?? '', value, isExtraFrame(description))}
             setFrameState={(frameState) => setFrameState(frameState, description.index)}
             nextFrameState={'Done'}
         />

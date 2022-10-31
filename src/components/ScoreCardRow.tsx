@@ -5,7 +5,7 @@ import { FrameDescription } from "../models/FrameDescription";
 import './ScoreCardRow.css'
 import { FrameStateEnum } from "../models/stateEnums";
 import { resolveScores } from "../functions/calculations";
-import { isExtraFrame, isLastFrame } from "../functions/analyzers";
+import { isExtraFrame, isLastFrame, isSpare, isStrike } from "../functions/analyzers";
 
 export function ScoreCardRow() {
   const [frameDescriptions, setFrameDescriptions] = useState<FrameDescription[]>(createFrameDescriptions())
@@ -34,13 +34,13 @@ export function ScoreCardRow() {
     if (activeFrame) {
       if (activeFrame.frameState === 'Done' && isLastFrame(activeFrame)) {
         setActiveFrame(null)
-      } else if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && !isExtraFrame(activeFrame)) {//activeFrame.index + 1 < frameDescriptions.length) {
+      } else if ((activeFrame.frameState === 'Done' || activeFrame.frameState === 'Pending') && !isExtraFrame(activeFrame)) {
         setActiveFrame(frameDescriptions[activeFrame.index + 1])
       } else if (isExtraFrame(activeFrame)) {
         const previousFrame = descriptions[activeFrame.index - 1]
-        if (previousFrame.secondThrow === '/' && activeFrame.frameState === 'Second Throw') {
+        if (isSpare(previousFrame.secondThrow) && activeFrame.frameState === 'Second Throw') {
           setFrameState('Done', activeFrame.index)
-        } else if (previousFrame.firstThrow === 'x' || previousFrame.firstThrow === 'X') {
+        } else if (isStrike(previousFrame.firstThrow)) {
           setFrameState('Second Throw', activeFrame.index)
         }
       }

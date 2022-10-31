@@ -103,7 +103,7 @@ describe('Scoring a Game', () => {
     expectFrame(10).totalToBe(136)
   })
 
-  it.skip('should score a game with strikes', () => {
+  it('should score a game with strikes', () => {
     function forFrame(frameNumber: number) {
       const label = `frame${frameNumber}`
       function throwStrike(throwNumber: number) {
