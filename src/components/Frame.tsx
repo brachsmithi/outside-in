@@ -16,6 +16,7 @@ export type FrameProps = {
 export function Frame({description, isActive, updateThrows, setFrameState}: FrameProps) {
   const throwOneInput = useRef<HTMLInputElement>(null)
   const throwTwoInput = useRef<HTMLInputElement>(null)
+  const throwThreeInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (description.frameState === 'Done') {
@@ -60,6 +61,17 @@ export function Frame({description, isActive, updateThrows, setFrameState}: Fram
             setFrameState={(frameState) => setFrameState(frameState, description.index)}
             nextFrameState={'Done'}
         />
+        {isExtraFrame(description) && (
+            <FrameInput
+                dataCy={ `${description.tag}_throw3` }
+                active={false}
+                inputRef={throwThreeInput}
+                isValidForThrow={() => false}
+                setFrameState={() => {}}
+                nextFrameState={'Done'}
+            />
+          )
+        }
       </div>
       <div className='frame-bottom'>
         <span data-cy={ `${description.tag}_total` }>{description.score}</span>
