@@ -820,3 +820,48 @@ Actually, looking over the task list, I never corrected it after noticing the ex
 7. Resolve a strike in the extra frame after a 9th frame strike. You have to stop rolling at some point, and the cut-off for the extra frame is that if you fill all three boxes you're done. (A perfect game is 300 points).
 
 After correcting for the miscount, it looks like we completed tasks 2 and 4 together. Let's move to the next task!
+
+## Create Third Input
+
+According to our updated tasks, we need to do the following.
+
+> Create a third input for the extra frame. We will need this in order to complete scoring a perfect game.
+
+This shouldn't be *too* bad, I think. It doesn't need to do anything except never be in focus yet.
+
+There's really no *need* for the frame yet, so there's no reason to test anything about it. It's just a component we wish we had. The assertions will come soon. Very soon.
+
+    {isExtraFrame(description) && (
+        <FrameInput
+            dataCy={ `${description.tag}_throw3` }
+            active={false}
+            inputRef={throwThreeInput}
+            isValidForThrow={() => false}
+            setFrameState={() => {}}
+            nextFrameState={'Done'}
+        />
+      )
+    }
+
+A quick visual check confirms that the third input has been added, however there's a problem.
+
+![Third Input Too Large](images/s4/s4_3rd_throw_unstyled.png)
+
+The frame needs to grow to accommodate the new input. Let's take a look at `Frame.css`.
+
+    .frame {
+        background: white;
+        display: flex;
+        flex-direction: column;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 1px solid black;
+        padding: 0;
+        margin: 0;
+    }
+
+The frame inputs have a declared width in their own CSS, so it's possible that we don't need one here.
+
+![Third Input Fits](images/s4/s4_3rd_throw_styled.png)
+
+Removing the width from frame seems to do the trick! That's it for task 3. We'll move on to task 5.
