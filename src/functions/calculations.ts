@@ -45,7 +45,13 @@ export function resolveScores(frameDescriptions: FrameDescription[]) {
         if (isSpare(previous.secondThrow) && current.firstThrow) {
           current.score = add(cumulativeScore, current.firstThrow)
         } else if (isStrike(previous.firstThrow) && current.secondThrow) {
-          current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+          if (isSpare(current.secondThrow)) {
+            if (current.thirdThrow) {
+              current.score = add(cumulativeScore, 10, current.thirdThrow)
+            }
+          } else {
+            current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+          }
         }
       }
     }

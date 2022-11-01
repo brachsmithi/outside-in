@@ -14,6 +14,7 @@ export function createFrameDescriptions(): FrameDescription[] {
       score: null,
       firstThrow: null,
       secondThrow: null,
+      thirdThrow: null,
       frameState: 'Not Started'
     })
   }

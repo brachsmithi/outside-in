@@ -9,10 +9,11 @@ describe('calculations', () => {
       return createFrameDescriptions()
     }
 
-    function setFrame(description: FrameDescription, state: FrameStateEnum, firstThrow: string | null = null, secondThrow: string | null = null) {
+    function setFrame(description: FrameDescription, state: FrameStateEnum, firstThrow: string | null = null, secondThrow: string | null = null, thirdThrow: string | null = null) {
       description.frameState = state
       description.firstThrow = firstThrow
       description.secondThrow = secondThrow
+      description.thirdThrow = thirdThrow
     }
 
     function assertScores(descriptions: FrameDescription[], expectedScores: number[]) {
@@ -177,6 +178,42 @@ describe('calculations', () => {
       resolveScores(descriptions)
 
       assertScores(descriptions, [9, 15, 23, 30, 35, 43, 51, 60, 78, 86])
+    })
+
+    it('should leave the extra frame unresolved when the second throw is a spare after a strike in the previous frame', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '3', '5')
+      setFrame(descriptions[1], 'Done', '4', '2')
+      setFrame(descriptions[2], 'Done', '5', '1')
+      setFrame(descriptions[3], 'Done', '4', '0')
+      setFrame(descriptions[4], 'Done', '5', '3')
+      setFrame(descriptions[5], 'Done', '2', '5')
+      setFrame(descriptions[6], 'Done', '2', '3')
+      setFrame(descriptions[7], 'Done', '4', '4')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Pending', '5', '/')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [8, 14, 20, 24, 32, 39, 44, 52, 72])
+    })
+
+    it('should resolve a spare in the extra frame after a strike in the previous frame', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '5', '2')
+      setFrame(descriptions[1], 'Done', '3', '6')
+      setFrame(descriptions[2], 'Done', '7', '1')
+      setFrame(descriptions[3], 'Done', '2', '4')
+      setFrame(descriptions[4], 'Done', '9', '0')
+      setFrame(descriptions[5], 'Done', '3', '5')
+      setFrame(descriptions[6], 'Done', '0', '8')
+      setFrame(descriptions[7], 'Done', '1', '6')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Pending', '6', '/', '5')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [7, 16, 24, 30, 39, 47, 55, 62, 82, 97])
     })
   })
 })
