@@ -17,17 +17,18 @@ export function ScoreCardRow() {
     setFrameDescriptions(descriptions)
   }
 
-  function setFrameThrows(firstThrow: string, secondThrow: string | null) {
+  function setFrameThrows(firstThrow: string, secondThrow: string | null, thirdThrow: string | null) {
     if (activeFrame) {
       const descriptions = [ ...frameDescriptions ]
       descriptions[activeFrame.index].firstThrow = firstThrow
       descriptions[activeFrame.index].secondThrow = secondThrow
+      descriptions[activeFrame.index].thirdThrow = thirdThrow
       setFrameDescriptions(descriptions)
     }
   }
 
-  const updateThrows = (firstThrow: string, secondThrow: string | null) => {
-    setFrameThrows(firstThrow, secondThrow)
+  const updateThrows = (firstThrow: string, secondThrow: string | null, thirdThrow: string | null) => {
+    setFrameThrows(firstThrow, secondThrow, thirdThrow)
     const descriptions = [...frameDescriptions]
     resolveScores(descriptions)
     setFrameDescriptions(descriptions)
@@ -42,7 +43,11 @@ export function ScoreCardRow() {
           setFrameState('Done', activeFrame.index)
         } else if (isStrike(previousFrame.firstThrow)) {
           if (secondThrow) {
-            setFrameState('Done', activeFrame.index)
+            if (isSpare(secondThrow)) {
+              setFrameState('Third Throw', activeFrame.index)
+            } else {
+              setFrameState('Done', activeFrame.index)
+            }
           } else {
             setFrameState('Second Throw', activeFrame.index)
           }

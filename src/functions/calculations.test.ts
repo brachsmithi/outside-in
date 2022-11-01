@@ -209,7 +209,7 @@ describe('calculations', () => {
       setFrame(descriptions[6], 'Done', '0', '8')
       setFrame(descriptions[7], 'Done', '1', '6')
       setFrame(descriptions[8], 'Pending', 'x')
-      setFrame(descriptions[9], 'Pending', '6', '/', '5')
+      setFrame(descriptions[9], 'Done', '6', '/', '5')
 
       resolveScores(descriptions)
 

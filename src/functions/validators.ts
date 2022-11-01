@@ -9,11 +9,18 @@ export function isFirstThrowValid(firstThrow: string) {
 }
 
 export function isSecondThrowValid(firstThrow: string, secondThrow: string, mayHaveSecondStrike: boolean): boolean {
-  if (isSpare(secondThrow) || (isStrike(secondThrow) && isStrikeValid(mayHaveSecondStrike, firstThrow))) {
-    return true
-  } else{
-    return Number(firstThrow) + Number(secondThrow) <= 9
-  }
+  return isUnderTen(firstThrow, secondThrow)
+      || isSpare(secondThrow)
+      || (isStrike(secondThrow) && isStrikeValid(mayHaveSecondStrike, firstThrow))
+}
+
+export function isThirdThrowValid(firstThrow: string, secondThrow: string, thirdThrow: string) {
+  return isSpare(secondThrow)
+      || (isStrike(firstThrow) && (isUnderTen(secondThrow, thirdThrow) || isSpare(thirdThrow)));
+}
+
+function isUnderTen(value1: string, value2: string) {
+  return Number(value1) + Number(value2) <= 9
 }
 
 function isStrikeValid(mayHaveSecondStrike: boolean, firstThrow: string) {

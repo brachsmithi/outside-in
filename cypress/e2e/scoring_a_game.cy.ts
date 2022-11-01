@@ -151,6 +151,70 @@ describe('Scoring a Game', () => {
     expectFrame(9).totalToBe(270)
   })
 
+  it('should score a game a spare in the extra frame', () => {
+    function spare() {
+      return '/'
+    }
+    function strike() {
+      return 'x'
+    }
+    function forFrame(frameNumber: number) {
+      const label = `frame${frameNumber}`
+      function rollBall(throwNumber: number, pinsKnockedDown: string) {
+        cy.get(`input[data-cy="${ label }_throw${throwNumber}"]`).should('have.focus').type(pinsKnockedDown).should('not.have.focus').should('be.disabled')
+      }
+      return {
+        throwOneIs(pinsKnockedDown1: string) {
+          rollBall(1, pinsKnockedDown1)
+          return {
+            throwTwoIs(pinsKnockedDown2: string) {
+              rollBall(2, pinsKnockedDown2)
+              return {
+                throwThreeIs(pinsKnockedDown3: string) {
+                  rollBall(3, pinsKnockedDown3)
+                }
+              }
+            },
+            throwTwoIsDisabled() {
+              cy.get(`input[data-cy="${ label }_throw2"]`).should('be.disabled')
+            }
+          }
+        }
+      }
+    }
+    function expectFrame(frameNumber: number) {
+      return {
+        totalToBe(total: number) {
+          cy.get(`[data-cy="frame${ frameNumber }_total"]`).should('have.text', String(total))
+        }
+      }
+    }
+
+    cy.visit('/')
+
+    forFrame(1).throwOneIs('7').throwTwoIs('1') // 8
+    forFrame(2).throwOneIs(strike()).throwTwoIsDisabled() // 28
+    forFrame(3).throwOneIs('5').throwTwoIs(spare()) // 47
+    forFrame(4).throwOneIs('9').throwTwoIs('0') // 56
+    forFrame(5).throwOneIs('6').throwTwoIs(spare()) // 71
+    forFrame(6).throwOneIs('5').throwTwoIs('2') // 78
+    forFrame(7).throwOneIs('8').throwTwoIs('1') // 87
+    forFrame(8).throwOneIs('4').throwTwoIs('2') // 93
+    forFrame(9).throwOneIs(strike()).throwTwoIsDisabled() // 113
+    forFrame(10).throwOneIs('7').throwTwoIs(spare()).throwThreeIs('4') // 127
+
+    expectFrame(1).totalToBe(8)
+    expectFrame(2).totalToBe(28)
+    expectFrame(3).totalToBe(47)
+    expectFrame(4).totalToBe(56)
+    expectFrame(5).totalToBe(71)
+    expectFrame(6).totalToBe(78)
+    expectFrame(7).totalToBe(87)
+    expectFrame(8).totalToBe(93)
+    expectFrame(9).totalToBe(113)
+    expectFrame(10).totalToBe(127)
+  })
+
   it('should not allow invalid data in the game', () => {
     function forFrame(frameNumber: number) {
       const label = `frame${frameNumber}`

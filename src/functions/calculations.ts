@@ -21,7 +21,7 @@ export function resolveScores(frameDescriptions: FrameDescription[]) {
     const [previous, current, next, afterNext] = lensOn(frameDescriptions, i)
     if (current.score === null) {
       const cumulativeScore = previous?.score ?? 0
-      if (current.frameState === 'Done') {
+      if (current.frameState === 'Done' && !current.thirdThrow) {
         current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
       } else if (current.frameState === 'Pending' && next) {
         if (isSpare(current.secondThrow) && next.firstThrow) {
