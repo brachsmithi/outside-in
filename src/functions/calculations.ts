@@ -41,8 +41,12 @@ export function resolveScores(frameDescriptions: FrameDescription[]) {
             }
           }
         }
-      } else if (isExtraFrame(current) && previous?.frameState === 'Pending' && current.firstThrow) {
-        current.score = add(cumulativeScore, current.firstThrow)
+      } else if (isExtraFrame(current) && previous?.frameState === 'Pending') {
+        if (isSpare(previous.secondThrow) && current.firstThrow) {
+          current.score = add(cumulativeScore, current.firstThrow)
+        } else if (isStrike(previous.firstThrow) && current.secondThrow) {
+          current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+        }
       }
     }
   }

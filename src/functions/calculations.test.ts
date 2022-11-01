@@ -142,5 +142,41 @@ describe('calculations', () => {
 
       assertScores(descriptions, [1, 6, 12, 15, 21, 26, 29, 35, 48, 51])
     })
+
+    it('should leave the extra frame unresolved until there are two throws following a strike', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '4', '3')
+      setFrame(descriptions[1], 'Done', '2', '2')
+      setFrame(descriptions[2], 'Done', '1', '5')
+      setFrame(descriptions[3], 'Done', '5', '0')
+      setFrame(descriptions[4], 'Done', '4', '0')
+      setFrame(descriptions[5], 'Done', '1', '5')
+      setFrame(descriptions[6], 'Done', '4', '2')
+      setFrame(descriptions[7], 'Done', '1', '6')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Second Throw', '7')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [7, 11, 17, 22, 26, 32, 38, 45])
+    })
+
+    it('should resolve the extra frame when there are two throws following a strike', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '5', '4')
+      setFrame(descriptions[1], 'Done', '3', '3')
+      setFrame(descriptions[2], 'Done', '2', '6')
+      setFrame(descriptions[3], 'Done', '6', '1')
+      setFrame(descriptions[4], 'Done', '5', '0')
+      setFrame(descriptions[5], 'Done', '2', '6')
+      setFrame(descriptions[6], 'Done', '5', '3')
+      setFrame(descriptions[7], 'Done', '2', '7')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Done', '3', '5')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [9, 15, 23, 30, 35, 43, 51, 60, 78, 86])
+    })
   })
 })
