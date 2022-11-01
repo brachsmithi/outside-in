@@ -865,3 +865,522 @@ The frame inputs have a declared width in their own CSS, so it's possible that w
 ![Third Input Fits](images/s4/s4_3rd_throw_styled.png)
 
 Removing the width from frame seems to do the trick! That's it for task 3. We'll move on to task 5.
+
+## Score Normal Throws in Extra Frame
+
+> Score the extra frame with two throws. Same as the previous step, except that the 10th frame is scored correctly as well.
+
+We saw earlier that the extra frame doesn't resolve with two numeric throws. For this task, we have to correct scoring in the extra frame.
+
+Let's start by testing the score resolver more.
+
+    it('should resolve the extra frame when there are two throws following a strike', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '5', '4')
+      setFrame(descriptions[1], 'Done', '3', '3')
+      setFrame(descriptions[2], 'Done', '2', '6')
+      setFrame(descriptions[3], 'Done', '6', '1')
+      setFrame(descriptions[4], 'Done', '5', '0')
+      setFrame(descriptions[5], 'Done', '2', '6')
+      setFrame(descriptions[6], 'Done', '5', '3')
+      setFrame(descriptions[7], 'Done', '2', '7')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Done', '3', '5')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [9, 15, 23, 30, 35, 43, 51, 60, 78, 86])
+    })
+
+This passes, so the problem isn't the score resolver, per se. As long as the extra frame is marked 'Done', the score resolver should work.
+
+In the test, all the descriptions are set with no scores before being passed in. In the "real" world, the descriptions are updated after every throw. If the score resolver is trying to look for only 1 throw in the extra frame before resolving the last frame, it would try to add the first throw to an unresolved total and end up with only the first throw as a score, which is the effect that we see. Let's write another test to narrow down the behavior.
+
+    it('should leave the extra frame unresolved until there are two throws following a strike', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '4', '3')
+      setFrame(descriptions[1], 'Done', '2', '2')
+      setFrame(descriptions[2], 'Done', '1', '5')
+      setFrame(descriptions[3], 'Done', '5', '0')
+      setFrame(descriptions[4], 'Done', '4', '0')
+      setFrame(descriptions[5], 'Done', '1', '5')
+      setFrame(descriptions[6], 'Done', '4', '2')
+      setFrame(descriptions[7], 'Done', '1', '6')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Second Throw', '7')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [7, 11, 17, 22, 26, 32, 38, 45])
+    })
+
+This fails with the same behavior we see in the manual tests. The extra frame has a score of 7, despite needing a second throw to resolve. The problem lies in the score resolver after all.
+
+    } else if (isExtraFrame(current) && previous?.frameState === 'Pending') {
+      if (isSpare(previous.secondThrow) && current.firstThrow) {
+        current.score = add(cumulativeScore, current.firstThrow)
+      } else if (isStrike(previous.firstThrow) && current.secondThrow) {
+        current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+      }
+    }
+
+With this amendment to the extra frame processing, the new test passes. The manual test works as well.
+
+We are no closer to fixing our all-strike end-to-end test, but the task is completed.
+
+## Score an Extra Frame Spare
+
+> Resolve a spare after a strike in the 9th frame. This is a special case, where the extra frame's score cannot be resolved until one more throw to resolve a spare.
+
+If the two extra frame throws after a strike result in a spare, then one more throw is needed to score the extra frame. This is where that third input comes in.
+
+First we'll add a score resolver test.
+
+    it('should leave the extra frame unresolved when the second throw is a spare after a strike in the previous frame', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '3', '5')
+      setFrame(descriptions[1], 'Done', '4', '2')
+      setFrame(descriptions[2], 'Done', '5', '1')
+      setFrame(descriptions[3], 'Done', '4', '0')
+      setFrame(descriptions[4], 'Done', '5', '3')
+      setFrame(descriptions[5], 'Done', '2', '5')
+      setFrame(descriptions[6], 'Done', '2', '3')
+      setFrame(descriptions[7], 'Done', '4', '4')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Pending', '5', '/')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [8, 14, 20, 24, 32, 39, 44, 52, 72])
+    })
+
+According to the test output, instead of being unresolved, the extra frame has a score of 'NaN'. We can add a check for rolling a spare in the extra frame.
+
+    } else if (isExtraFrame(current) && previous?.frameState === 'Pending') {
+      if (isSpare(previous.secondThrow) && current.firstThrow) {
+        current.score = add(cumulativeScore, current.firstThrow)
+      } else if (isStrike(previous.firstThrow) && current.secondThrow) {
+        if (isSpare(current.secondThrow)) {
+          if (current.thirdThrow) {
+            current.score = add(cumulativeScore)
+          }
+        } else {
+          current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+        }
+      }
+    }
+
+Obviously, this won't be enough to properly score a spare in the extra frame, but it gets us to the next test we need to write.
+
+    it('should resolve a spare in the extra frame after a strike in the previous frame', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '5', '2')
+      setFrame(descriptions[1], 'Done', '3', '6')
+      setFrame(descriptions[2], 'Done', '7', '1')
+      setFrame(descriptions[3], 'Done', '2', '4')
+      setFrame(descriptions[4], 'Done', '9', '0')
+      setFrame(descriptions[5], 'Done', '3', '5')
+      setFrame(descriptions[6], 'Done', '0', '8')
+      setFrame(descriptions[7], 'Done', '1', '6')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Pending', '6', '/', '5')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [7, 16, 24, 30, 39, 47, 55, 62, 82, 97])
+    })
+
+Strangely, the error is that the extra frame is scored as 82, which is the total for the previous frame. This is because that's exactly what we told it to do for resolving spares in the extra frame. Time to change that.
+
+All we need to do is add 10 and the value of the third throw. The third throw doesn't count a second time; it's only there to resolve the spare. Here's the new `resolveScores` function.
+
+    export function resolveScores(frameDescriptions: FrameDescription[]) {
+      for (let i = 0; i < frameDescriptions.length; i++) {
+        const [previous, current, next, afterNext] = lensOn(frameDescriptions, i)
+        if (current.score === null) {
+          const cumulativeScore = previous?.score ?? 0
+          if (current.frameState === 'Done') {
+            current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+          } else if (current.frameState === 'Pending' && next) {
+            if (isSpare(current.secondThrow) && next.firstThrow) {
+              current.score = add(cumulativeScore, 10, next.firstThrow)
+            } else if (isStrike(current.firstThrow)) {
+              if (next.secondThrow) {
+                if (isSpare(next.secondThrow)) {
+                  current.score = add(cumulativeScore, 20)
+                } else {
+                  current.score = add(cumulativeScore, 10, next.firstThrow, next.secondThrow)
+                }
+              } else if (afterNext && afterNext.firstThrow) {
+                if (isStrike(afterNext.firstThrow)) {
+                  current.score = add(cumulativeScore, 30)
+                } else {
+                  current.score = add(cumulativeScore, 20, afterNext.firstThrow)
+                }
+              }
+            }
+          } else if (isExtraFrame(current) && previous?.frameState === 'Pending') {
+            if (isSpare(previous.secondThrow) && current.firstThrow) {
+              current.score = add(cumulativeScore, current.firstThrow)
+            } else if (isStrike(previous.firstThrow) && current.secondThrow) {
+              if (isSpare(current.secondThrow)) {
+                if (current.thirdThrow) {
+                  current.score = add(cumulativeScore, 10, current.thirdThrow)
+                }
+              } else {
+                current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+              }
+            }
+          }
+        }
+      }
+    }
+
+Ghastly, isn't it? I still don't have a good idea of how to clean that up, but I'm getting itchy to have done with it.
+
+At any rate, we still have some work to do on this task.
+
+A manual test shows that we're not opening the third input after a spare in the extra frame.
+
+    } else if (isExtraFrame(activeFrame)) {
+      const previousFrame = descriptions[activeFrame.index - 1]
+      if (isSpare(previousFrame.secondThrow) && activeFrame.frameState === 'Second Throw') {
+        setFrameState('Done', activeFrame.index)
+      } else if (isStrike(previousFrame.firstThrow)) {
+        if (secondThrow) {
+          if (isSpare(secondThrow)) {
+            setFrameState('Third Throw', activeFrame.index)
+          } else {
+            setFrameState('Done', activeFrame.index)
+          }
+        } else {
+          setFrameState('Second Throw', activeFrame.index)
+        }
+      }
+    }
+
+We now divide the second throw logic of the after-strike extra frame handling. If the second throw results in a spare, we set the state to 'Third Throw' (which requires an addition to the FrameStateEnum). Otherwise, we resolve as before. This isn't enough, as nothing looks for the state yet.
+
+    {isExtraFrame(description) && (
+        <FrameInput
+            dataCy={ `${description.tag}_throw3` }
+            active={description.frameState === 'Third Throw'}
+            inputRef={throwThreeInput}
+            isValidForThrow={() => false}
+            setFrameState={() => {}}
+            nextFrameState={'Done'}
+        />
+      )
+    }
+
+This activates the third throw, but we're passing in a hard-coded false for the validity check.
+
+All the special-casing around activation of inputs in the extra frame are making me nervous. It's one thing to gloss over specific end-to-end tests for variation of the other frames, as they're pretty simple, but it's become apparent that we're continually turning to manual tests to verify where we are in the functionality of the extra frame. Rather than a sanity check after TDD, it's becoming a means of testing after the fact, and I don't like it. Let's add another end-to-end test for our spare in the extra frame.
+
+    it('should score a game a spare in the extra frame', () => {
+      function spare() {
+        return '/'
+      }
+      function strike() {
+        return 'x'
+      }
+      function forFrame(frameNumber: number) {
+        const label = `frame${frameNumber}`
+        function rollBall(throwNumber: number, pinsKnockedDown: string) {
+          cy.get(`input[data-cy="${ label }_throw${throwNumber}"]`).should('have.focus').type(pinsKnockedDown).should('not.have.focus').should('be.disabled')
+        }
+        return {
+          throwOneIs(pinsKnockedDown1: string) {
+            rollBall(1, pinsKnockedDown1)
+            return {
+              throwTwoIs(pinsKnockedDown2: string) {
+                rollBall(2, pinsKnockedDown2)
+                return {
+                  throwThreeIs(pinsKnockedDown3: string) {
+                    rollBall(3, pinsKnockedDown3)
+                  }
+                }
+              },
+              throwTwoIsDisabled() {
+                cy.get(`input[data-cy="${ label }_throw2"]`).should('be.disabled')
+              }
+            }
+          }
+        }
+      }
+      function expectFrame(frameNumber: number) {
+        return {
+          totalToBe(total: number) {
+            cy.get(`[data-cy="frame${ frameNumber }_total"]`).should('have.text', String(total))
+          }
+        }
+      }
+
+      cy.visit('/')
+
+      forFrame(1).throwOneIs('7').throwTwoIs('1') // 8
+      forFrame(2).throwOneIs(strike()).throwTwoIsDisabled() // 28
+      forFrame(3).throwOneIs('5').throwTwoIs(spare()) // 47
+      forFrame(4).throwOneIs('9').throwTwoIs('0') // 56
+      forFrame(5).throwOneIs('6').throwTwoIs(spare()) // 71
+      forFrame(6).throwOneIs('5').throwTwoIs('2') // 78
+      forFrame(7).throwOneIs('8').throwTwoIs('1') // 87
+      forFrame(8).throwOneIs('4').throwTwoIs('2') // 93
+      forFrame(9).throwOneIs(strike()).throwTwoIsDisabled() // 113
+      forFrame(10).throwOneIs('7').throwTwoIs(spare()).throwThreeIs('4') // 127
+
+      expectFrame(1).totalToBe(8)
+      expectFrame(2).totalToBe(28)
+      expectFrame(3).totalToBe(47)
+      expectFrame(4).totalToBe(56)
+      expectFrame(5).totalToBe(71)
+      expectFrame(6).totalToBe(78)
+      expectFrame(7).totalToBe(87)
+      expectFrame(8).totalToBe(93)
+      expectFrame(9).totalToBe(113)
+      expectFrame(10).totalToBe(127)
+    })
+
+That gives us something repeatable to tell us when we've fixed the problem. The repetition in the end-to-end helper functions is getting out of control. We should remember to address them at the end of this step. Let's add it to our task list.
+
+1. ~~Allow an 'X' to be entered in the first throw. This includes making the focus shift to the next frame. By the end of this task, a game should be able to have a strike in every frame, including the extra frame.~~
+2. ~~Score strikes up through the 8th frame. After that, it will get more complicated, so this task ends when the 8th strike in a row has a resolved score.~~
+3. ~~Create a third input for the extra frame. We will need this in order to complete scoring a perfect game.~~
+4. ~~Resolve a strike in the 9th frame. This requires activating the second input in the extra frame. When a 9th frame strike is correctly scored with two non-special throws, this task is complete.~~
+5. Score the extra frame with two throws. Same as the previous step, except that the 10th frame is scored correctly as well.
+6. Resolve a spare after a strike in the 9th frame. This is a special case, where the extra frame's score cannot be resolved until one more throw to resolve a spare.
+7. Resolve a strike in the extra frame after a 9th frame strike. You have to stop rolling at some point, and the cut-off for the extra frame is that if you fill all three boxes you're done. (A perfect game is 300 points).
+8. Address duplication in Cypress tests
+
+Now let's see about getting that 3rd throw in focus. It's activated, but we missed something.
+
+Turns out that the Frame doesn't have any handling for a state of 'Third Throw'. We should add one.
+
+      } else if (description.frameState === 'Second Throw') {
+        if (throwOneInput.current) {
+          updateThrows(throwOneInput.current.value, null)
+        }
+        throwTwoInput.current?.focus()
+      } else if (description.frameState === 'Third Throw') {
+        throwThreeInput.current?.focus()
+      }
+    }, [description.frameState])
+
+That makes the third throw input focused, but when we enter our value, it's invalid. We're hard-coding the validity function to always report that. What is valid here? Strikes are conditionally valid, but we're not there yet. Any number is valid if the second throw is a spare. If the first is a strike, then this could be a spare or a number that adds with the second throw to be under 10. We need another validator.
+
+    describe('isThirdThrowValid', () => {
+
+      type ThrowConstraints = {
+        min: number,
+        max: number,
+      }
+
+      type ConstraintCalculator = {
+        min: (seed: number) => number,
+        max: (seed: number) => number,
+      }
+
+      function calculateConstraints(calculator: ConstraintCalculator, seed: number): ThrowConstraints {
+        return {
+          min: calculator.min(seed),
+          max: calculator.max(seed),
+        }
+      }
+
+      function throwGenerator(firstThrowConstraints: ThrowConstraints, secondThrowCalculator: ConstraintCalculator) {
+        return fc.integer(firstThrowConstraints).chain((first) => {
+          return fc.tuple(
+              fc.constant(String(first)),
+              fc.integer(calculateConstraints(secondThrowCalculator, first)).chain(num => {
+                return fc.constant(String(num))
+              })
+          );
+        })
+      }
+
+      function generateValidThrows() {
+        return throwGenerator({min: 0, max: 9}, {min: (_: number) => 0, max: (first: number) => 9 - first})
+      }
+
+      function generateInvalidThrows() {
+        return throwGenerator({min: 1, max: 9}, {min: (first: number) => 10 - first, max: (_: number) => 9})
+      }
+
+      it('should allow totals under 10 or a spare, following a strike', () => {
+        fc.assert(fc.property(generateValidThrows(), (pinCounts: string[]) => {
+          return isThirdThrowValid('x', pinCounts[0], pinCounts[1])
+        }), {numRuns: 20, skipEqualValues: true})
+        fc.assert(fc.property(fc.integer({min: 0, max: 9}), (secondThrow: number) => {
+          return isThirdThrowValid('x', String(secondThrow), '/')
+        }))
+      })
+
+      it('should not allow totals over 10, following a strike', () => {
+        fc.assert(fc.property(generateInvalidThrows(), (pinCounts: string[]) => {
+          return !isThirdThrowValid('x', pinCounts[0], pinCounts[1])
+        }), {numRuns: 20, skipEqualValues: true})
+      })
+
+      it('should allow any number after a spare', () => {
+        fc.assert(fc.property(fc.integer({min: 0, max: 9}), (thirdThrow: number) => {
+          return isThirdThrowValid('9', '/', String(thirdThrow))
+        }), {numRuns: 10, skipEqualValues: true})
+      })
+    })
+
+There's some heavy duplication here, and we'll deal with that after the tests are passing.
+
+    export function isThirdThrowValid(firstThrow: string, secondThrow: string, thirdThrow: string) {
+      return false
+    }
+
+This makes the tests compile. Let's focus on getting `should allow any number after a spare` passing, as it's the case we're actually trying to get working.
+
+    export function isThirdThrowValid(firstThrow: string, secondThrow: string, thirdThrow: string) {
+      return isSpare(secondThrow);
+    }
+
+All we needed to check was whether the second throw is a spare. The only failing test is for values being under 10 after a strike.
+
+    export function isThirdThrowValid(firstThrow: string, secondThrow: string, thirdThrow: string) {
+      return isSpare(secondThrow) || (isStrike(firstThrow)
+          && (Number(secondThrow) + Number(thirdThrow) <= 9 || isSpare(thirdThrow)));
+    }
+
+This works, but it's unwieldy. It also duplicates the logic about being under 9 from the second throw validation.
+
+    export function isSecondThrowValid(firstThrow: string, secondThrow: string, mayHaveSecondStrike: boolean): boolean {
+      return isUnderTen(firstThrow, secondThrow)
+          || isSpare(secondThrow)
+          || (isStrike(secondThrow) && isStrikeValid(mayHaveSecondStrike, firstThrow))
+    }
+
+    export function isThirdThrowValid(firstThrow: string, secondThrow: string, thirdThrow: string) {
+      return isSpare(secondThrow)
+          || (isStrike(firstThrow) && (isUnderTen(secondThrow, thirdThrow) || isSpare(thirdThrow)));
+    }
+
+    function isUnderTen(value1: string, value2: string) {
+      return Number(value1) + Number(value2) <= 9
+    }
+
+Now we need to plug this into the FrameInput declaration for the third throw.
+
+    {isExtraFrame(description) && (
+        <FrameInput
+            dataCy={ `${description.tag}_throw3` }
+            active={description.frameState === 'Third Throw'}
+            inputRef={throwThreeInput}
+            isValidForThrow={(value: string) => isThirdThrowValid(throwOneInput.current?.value ?? '', throwTwoInput.current?.value ?? '', value)}
+            setFrameState={() => {}}
+            nextFrameState={'Done'}
+        />
+      )
+    }
+
+The end-to-end test now allows entry in the third throw, but it doesn't move focus afterward. Whatever the outcome of the throw, the game is over, so passing 'Done' as the next frame state is correct. We're passing a noop function for setting the state, however.
+
+    {isExtraFrame(description) && (
+        <FrameInput
+            dataCy={ `${description.tag}_throw3` }
+            active={description.frameState === 'Third Throw'}
+            inputRef={throwThreeInput}
+            isValidForThrow={(value: string) => isThirdThrowValid(throwOneInput.current?.value ?? '', throwTwoInput.current?.value ?? '', value)}
+            setFrameState={(frameState) => setFrameState(frameState, description.index)}
+            nextFrameState={'Done'}
+        />
+      )
+    }
+
+Now the game completes, and the checks on scoring run until failing in the extra frame. Before we figure out what went wrong there, let's do some quick cleanup in Frame. All three inputs take the same callback for `setFrameState`. We should extract that into a constant.
+
+    const frameStateCallback = (frameState: FrameStateEnum) => setFrameState(frameState, description.index)
+
+    return (
+      <div className='frame'>
+        <div className='frame-top'>
+          <FrameInput
+              dataCy={ `${description.tag}_throw1` }
+              active={description.frameState === 'First Throw'}
+              inputRef={throwOneInput}
+              isValidForThrow={isFirstThrowValid}
+              setFrameState={frameStateCallback}
+              nextFrameState={'Second Throw'}
+          />
+
+Now, what's wrong with our scoring? We're getting NaN after a spare in the extra frame.
+
+Our scoring test case is passing for this exact condition, so what's wrong? Well, maybe the test is. We have it putting the extra frame in 'Pending' before scoring, but unless the third throw is a spare or a strike it will set the state to 'Done'. We need to correct the test.
+
+    setFrame(descriptions[9], 'Done', '6', '/', '5')
+
+    resolveScores(descriptions)
+
+Now our unit test gets the same failure we see in our end-to-end test! Looking at `resolveScores`, the very first condition adds the first two throws whenever the state is 'Done'. This will work in the majority of frames as well as in some extra frame cases, but for scoring a spare in the extra frame it will not work. We need to exempt extra frame's with 'Done' state when there's a third throw. (There may be other cases as well, but what we know for certain is that the score for an extra frame with a third throw will never be the sum of the first two throws unless the third is a zero.)
+
+    if (current.frameState === 'Done' && !current.thirdThrow) {
+      current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)
+    } else if (current.frameState === 'Pending' && next) {
+
+A guard against having a third throw allows the extra frame logic we wrote to take effect. Sadly, that's still not right though. The unit test works, but there's still a NaN in the extra frame. Manual testing confirms that it only appears once the third throw is entered. Time to debug and see what's going on, because our calculation is not getting what we tested for. Let's start in the calculator itself. It's a jumble, so it's not unreasonable to assume that the problem lies there.
+
+To start, we'll log the extra frame's description each time the score is resolved.
+
+    firstThrow: null
+    frameState: "First Throw"
+    index: 9
+    score: null
+    secondThrow: null
+    tag: "frame10"
+    thirdThrow: null
+
+    firstThrow: 7
+    frameState: "Second Throw"
+    index: 9
+    score: null
+    secondThrow: null
+    tag: "frame10"
+    thirdThrow: null
+
+    firstThrow: 7
+    frameState: "Third Throw"
+    index: 9
+    score: null
+    secondThrow: "/"
+    tag: "frame10"
+    thirdThrow: null
+
+    firstThrow: 7
+    frameState: "Done"
+    index: 9
+    score: NaN
+    secondThrow: "/"
+    tag: "frame10"
+    thirdThrow: null
+
+It appears that the calculator is working correctly. It's just not getting the value of the third throw! First we need to update the Frame.
+
+    if (description.frameState === 'Done') {
+      if (throwOneInput.current && throwTwoInput.current) {
+        updateThrows(throwOneInput.current.value, throwTwoInput.current.value, throwThreeInput.current?.value ?? null)
+      }
+    }
+
+This allows the third throw to get passed to the ScoreCardRow. Unfortunately, this changes the signature of `updateThrows` in the props for Frame and in the defined function of ScoreCardRow. In the ScoreCardRow, we make a few more changes.
+
+    function setFrameThrows(firstThrow: string, secondThrow: string | null, thirdThrow: string | null) {
+      if (activeFrame) {
+        const descriptions = [ ...frameDescriptions ]
+        descriptions[activeFrame.index].firstThrow = firstThrow
+        descriptions[activeFrame.index].secondThrow = secondThrow
+        descriptions[activeFrame.index].thirdThrow = thirdThrow
+        setFrameDescriptions(descriptions)
+      }
+    }
+
+    const updateThrows = (firstThrow: string, secondThrow: string | null, thirdThrow: string | null) => {
+      setFrameThrows(firstThrow, secondThrow, thirdThrow)
+      const descriptions = [...frameDescriptions]
+      resolveScores(descriptions)
+
+The third throw now gets passed to `setFrameThrows`, where it is set into the description of the active frame. With that, our end-to-end test for resolving a spare in the extra frame passes!
