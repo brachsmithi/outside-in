@@ -27,7 +27,10 @@ export function resolveScores(frameDescriptions: FrameDescription[]) {
         if (isSpare(current.secondThrow) && next.firstThrow) {
           current.score = add(cumulativeScore, 10, next.firstThrow)
         } else if (isStrike(current.firstThrow)) {
-          if (next.secondThrow) {
+          if (isStrike(next.firstThrow) && isExtraFrame(next) && next.secondThrow) {
+            const secondValue = isStrike(next.secondThrow) ? 10 : next.secondThrow
+            current.score = add(cumulativeScore, 20, secondValue)
+          } else if (next.secondThrow) {
             if (isSpare(next.secondThrow)) {
               current.score = add(cumulativeScore, 20)
             } else {
@@ -48,6 +51,12 @@ export function resolveScores(frameDescriptions: FrameDescription[]) {
           if (isSpare(current.secondThrow)) {
             if (current.thirdThrow) {
               current.score = add(cumulativeScore, 10, current.thirdThrow)
+            }
+          } else if (isStrike(current.firstThrow)) {
+            if (current.secondThrow && current.thirdThrow) {
+              const secondValue = isStrike(current.secondThrow) ? 10 : current.secondThrow
+              const thirdValue = isStrike(current.thirdThrow) ? 10 : current.thirdThrow
+              current.score = add(cumulativeScore, 10, secondValue, thirdValue)
             }
           } else {
             current.score = add(cumulativeScore, current.firstThrow, current.secondThrow)

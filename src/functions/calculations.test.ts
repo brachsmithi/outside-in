@@ -215,5 +215,23 @@ describe('calculations', () => {
 
       assertScores(descriptions, [7, 16, 24, 30, 39, 47, 55, 62, 82, 97])
     })
+
+    it('should resolve a strike in the last frame when followed by a strike and a second throw in the extra frame', () => {
+      const descriptions = frameDescriptions()
+      setFrame(descriptions[0], 'Done', '7', '2')
+      setFrame(descriptions[1], 'Done', '3', '4')
+      setFrame(descriptions[2], 'Done', '5', '2')
+      setFrame(descriptions[3], 'Done', '3', '4')
+      setFrame(descriptions[4], 'Done', '8', '1')
+      setFrame(descriptions[5], 'Done', '4', '2')
+      setFrame(descriptions[6], 'Done', '0', '7')
+      setFrame(descriptions[7], 'Done', '8', '0')
+      setFrame(descriptions[8], 'Pending', 'x')
+      setFrame(descriptions[9], 'Third Throw', 'x', '4')
+
+      resolveScores(descriptions)
+
+      assertScores(descriptions, [9, 16, 23, 30, 39, 45, 52, 60, 84])
+    })
   })
 })

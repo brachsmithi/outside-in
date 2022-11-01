@@ -115,6 +115,9 @@ describe('Scoring a Game', () => {
         },
         enterSecondStrike() {
           throwStrike(2)
+        },
+        enterThirdStrike() {
+          throwStrike(3)
         }
       }
     }
@@ -139,6 +142,7 @@ describe('Scoring a Game', () => {
     forFrame(9).enterStrike()
     forFrame(10).enterStrike()
     forFrame(10).enterSecondStrike()
+    forFrame(10).enterThirdStrike()
 
     expectFrame(1).totalToBe(30)
     expectFrame(2).totalToBe(60)
@@ -192,16 +196,16 @@ describe('Scoring a Game', () => {
 
     cy.visit('/')
 
-    forFrame(1).throwOneIs('7').throwTwoIs('1') // 8
-    forFrame(2).throwOneIs(strike()).throwTwoIsDisabled() // 28
-    forFrame(3).throwOneIs('5').throwTwoIs(spare()) // 47
-    forFrame(4).throwOneIs('9').throwTwoIs('0') // 56
-    forFrame(5).throwOneIs('6').throwTwoIs(spare()) // 71
-    forFrame(6).throwOneIs('5').throwTwoIs('2') // 78
-    forFrame(7).throwOneIs('8').throwTwoIs('1') // 87
-    forFrame(8).throwOneIs('4').throwTwoIs('2') // 93
-    forFrame(9).throwOneIs(strike()).throwTwoIsDisabled() // 113
-    forFrame(10).throwOneIs('7').throwTwoIs(spare()).throwThreeIs('4') // 127
+    forFrame(1).throwOneIs('7').throwTwoIs('1')
+    forFrame(2).throwOneIs(strike()).throwTwoIsDisabled()
+    forFrame(3).throwOneIs('5').throwTwoIs(spare())
+    forFrame(4).throwOneIs('9').throwTwoIs('0')
+    forFrame(5).throwOneIs('6').throwTwoIs(spare())
+    forFrame(6).throwOneIs('5').throwTwoIs('2')
+    forFrame(7).throwOneIs('8').throwTwoIs('1')
+    forFrame(8).throwOneIs('4').throwTwoIs('2')
+    forFrame(9).throwOneIs(strike()).throwTwoIsDisabled()
+    forFrame(10).throwOneIs('7').throwTwoIs(spare()).throwThreeIs('4')
 
     expectFrame(1).totalToBe(8)
     expectFrame(2).totalToBe(28)
